@@ -28,7 +28,7 @@
 		$.get('http://localhost:3000/process?email=' + $('#email').val(), function(result) {
                 	$('#msg').html('Running bot ... '); 
             	});
-                $('#status').html("An email with the report will be sent to " + email + " upon completion.");
+                $('#status').html("<li>An email with the report will be sent to " + email + " upon completion.</li><li>The report will be saved under the `Reports` tab</li>");
                 $('#email-error').hide();
             } else {
                 $('#email-error').html('Please enter a valid email');
