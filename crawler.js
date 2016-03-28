@@ -12,14 +12,15 @@
  * --logfile={logfile} log file name
  * --ua_help print available user-agent options
  * --ua={UA_KEY} use specified user-agent (ex: --ua=Chrome41/Win7)
+ * --src={db|file} feed data source 
  * 
  * User-agents are configured in includes/useragents.js
  * 
  * Features:
  * - Capture screenshot of violating lander (JS Alerts)
  * - Checks for JS Alerts (JS Pop)
- * - Checks for Overlays (planned)
- * - Checks for download dialogs triggers (planned)
+ * - Checks for Overlays 
+ * - Checks for download dialogs triggers 
  * - Checks for 404/500 errors
  * 
  * Feed: default data/feed.csv otherwise read from --feed=FEED option on CLI, 
@@ -39,9 +40,10 @@ var util        = require('util');
 var ua          = '';
 
 // default feed config
+var formatter   = "%s%s%s%s%s%s%s%s%s%s%s%s%s\n";
 var feed        = 'data/feed.csv';
 var delim       = ",";
-var log_delim   = "|";
+var log_delim   = ",";
 
 // casper config
 var casper = require("casper").create({
@@ -54,9 +56,10 @@ var casper = require("casper").create({
         loadPlugins: false          // use these settings
     },
     userAgent: userAgents[userAgents.length-1],
-    verbose: false,
+    verbose: true,
     logLevel: 'error',
     exitOnError: false,
+    waitTimeout: 2000,
     onAlert: handleAlert,
     onLoadError: handleLoadError,
 });
@@ -71,10 +74,19 @@ logfile     = casper.cli.options.logfile ? 'logs/' + casper.cli.options.logfile 
 delim       = casper.cli.options.delim || delim;
 log_delim   = casper.cli.options.log_delim || log_delim;
 ua          = casper.cli.options.ua ? casper.cli.options.ua : 'Chrome41/Win7'; 
+var src     = casper.cli.options.src ? casper.cli.options.src : 'file';
+
+// truncate logger
+try {
+    if(fs.isFile(logfile)){
+        fs.remove(logfile);
+    }
+} catch (e) {
+    console.log(e);
+}
 
 // report header
-fs.write(logfile, util.format("%s %s %s %s %s %s %s %s %s %s %s %s %s\n", 
-'Account ID', log_delim, 'Campaign ID', log_delim, 'Campaign Name', log_delim, 'Error Type', log_delim, 'Message', log_delim, 'URL', log_delim, 'Screenshot'), 'a');
+fs.write(logfile, util.format(formatter, 'Account ID', log_delim, 'Campaign ID', log_delim, 'Campaign Name', log_delim, 'Error Type', log_delim, 'Message', log_delim, 'URL', log_delim, 'Screenshot'), 'a');
 
 // switch for user-agents menu
 if(casper.cli.options.hasOwnProperty("ua_help")) {
@@ -97,18 +109,22 @@ casper.echo("Logfile: " + logfile);
 casper.echo("---------------------------------");
 casper.echo("Starting ...");
 
+var urls = [];
+   
+getData(feed, delim, src, function(res) {
+    urls = res;
+});
 
-// Main
-var urls    = getData(feed);
+if(urls.length < 1) console.log('Did not get any URLs to process, existing.');
+
 crawl(ua, urls);
 
 
 // crawl
 function crawl(ua_key, urls) {
-    // url counter
-    var i = 0;
+    
+    var i = 1;
         
-    // start casper engine
     casper.start();
     casper.userAgent(casper.userAgents[ua_key]);
    
@@ -121,31 +137,43 @@ function crawl(ua_key, urls) {
         var f       = util.format('%s_%s_%s', aid, cid, cname);
         var remote_img  = util.format('%sscreenshots/%s_%s_%sx%s.png', rackspace.CDN_IMG_HOST, f, ua_key.replace(/\//g, "."), screen._width, screen._height);
         
-        casper.campaign = {"aid": aid, "cid": cid, "cname": cname, "remote_img": remote_img};
+        casper.campaign = {"url": url, "aid": aid, "cid": cid, "cname": cname, "remote_img": remote_img};
               
         casper.thenOpen(url, function openUrl(res) {
-            // skip header line
-            if(i !== 0) {
-                this.echo(util.format('%d) %s: %s [%s]', i, ua_key, res.url, res.status));        
-                var file    = util.format('%s_%s_%s', aid, cid, cname);
-                var loc_img = util.format('screenshots/%s_%s_%sx%s.png',file, ua_key.replace(/\//g, "."), screen._width, screen._height);
-                                
-                this.capture(loc_img, {
-                    top: screen._top,
-                    left: screen._left,
-                    width: screen._width,
-                    height: screen._height
-                });
+            
+            var errors = [];
+            
+            this.echo(util.format('%d) %s: %s [%s]', i++, ua_key, url, res.status));    
+            this.currentResponse.headers.forEach(function(header){
+                if(header.name === 'X-Frame-Options' && (header.value === 'SAMEORIGIN' || header.value === 'DENY')) {
+                    errors.push(util.format('%s: %s', header.name, header.value));
+                }
+            });
+  
+            var file    = util.format('%s_%s_%s', aid, cid, cname);
+            var loc_img = util.format('screenshots/%s_%s_%sx%s.png',file, ua_key.replace(/\//g, "."), screen._width, screen._height);
+                        
+            if(res.status == 404) {
+                errors.push('404 Error');
+            }
+            
+            if(res.status >= 500) {
+                errors.push('500 Error');
+            }
+            
+            if(errors.length > 0) {
+                fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim, 
+                errors.join('|'), log_delim, errors.join('|'), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
+            }
+            
+            this.capture(loc_img, {
+                top: screen._top,
+                left: screen._left,
+                width: screen._width,
+                height: screen._height
+            });
                
-                this.on('http.status.404', function is404() {
-                    fs.write(logfile, util.format("%s %s %s %s %s %s %s %s %s %s %s %s %s\n", aid, log_delim, cid, log_delim, cname, log_delim, '404 Error', log_delim, '404 Error', log_delim, url, log_delim, casper.campaign.remote_img), 'a');
-                });
-
-                this.on('http.status.500', function is500() {
-                    fs.write(logfile, util.format("%s %s %s %s %s %s %s %s %s %s %s %s %s\n", aid, log_delim, cid, log_delim, cname, log_delim, '500 Error', log_delim, '500 Error', log_delim, url, log_delim, casper.campaign.remote_img), 'a');  
-                });
-            } i++;
-        }, logfile, screen, url, aid, cid, cname, ua_key, log_delim)
+        }, logfile, screen, casper.campaign.url, aid, cid, cname, ua_key, log_delim)
         
     }, ua_key, casper, userAgents)
            
@@ -158,32 +186,40 @@ function crawl(ua_key, urls) {
 
 // onAlert handler
 function handleAlert(casper, msg) {
-    var url = casper.getCurrentUrl();
-    fs.write(logfile, util.format("%s %s %s %s %s %s %s %s %s %s %s %s %s\n", casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim,
-            'JS Alert (Pop)', log_delim, msg.replace(/\*/g,'').replace(/\r\n|\n|\r/gm,' ').replace(',',''), log_delim, url, log_delim, casper.campaign.remote_img), 'a');  
+    if(casper.campaign.url == casper.getCurrentUrl()) {
+        fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim,
+            'JS Alert (Pop)', log_delim, msg.replace(/\*/g,'').replace(/\r\n|\n|\r/gm,' ').replace(',',''), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
+    }
 }
 
 // onLoadError handler
 function handleLoadError(casper, msg) {
-    var url = casper.getCurrentUrl();
-    fs.write(logfile, util.format("%s %s %s %s %s %s %s %s %s %s %s %s %s\n", casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim, 
-            'Resource Load Error', log_delim, 'Unavailable', log_delim, url, log_delim, casper.campaign.remote_img), 'a');
+    if(casper.campaign.url == casper.getCurrentUrl()) {
+        fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim, 
+            'Resource Load Error', log_delim, 'Unavailable', log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a');
+    }
 }
 
 // getData
-function getData(feed, delim) {
-    var urls = []; 
-    stream = fs.open(feed, 'r');
-    line = stream.readLine();
-    urls.push(line);
-    while(line) {
-        line = stream.readLine();
-        var parts = line.split(delim);
-        if(parts[parts.length-1]) {
-            urls.push(line); 
-        }
-    }
-    return urls;
+function getData(feed, delim, source, cb) {
+    
+    switch(source) {
+        case 'file':
+        default:
+            var urls = [];
+            stream = fs.open(feed, 'r');
+            line = stream.readLine();
+            urls.push(line);
+            while(line) {
+                line = stream.readLine();
+                var parts = line.split(delim);
+                if(parts[parts.length-1]) {
+                    urls.push(line); 
+                }
+            }
+            cb(urls);
+            break;
+    };
 }
 
 // getLogfile

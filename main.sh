@@ -21,6 +21,7 @@ usage() {
 	echo "-d delimiter (default ,)"
 	echo "-u user-agent to use in spider (use key from object below)"
 	echo "-r email recipient of report"
+	echo "-s data source (db|file) the above -f is ignored if this is set"
 	echo "-h help"
 	echo ""
 	echo "User Agents:"
@@ -30,7 +31,7 @@ usage() {
 
 args=""
 
-while getopts ":f:d:l:u:r:m:h" opt; do
+while getopts ":f:d:l:u:r:s:m:h" opt; do
   case $opt in
     f) 	feed="$OPTARG"; args+=" --feed=$feed"
     ;;
@@ -44,6 +45,8 @@ while getopts ":f:d:l:u:r:m:h" opt; do
     ;;
     m) 	log_delim="$OPTARG"; args+=" --log_delim=$log_delim"
     ;;
+    s) 	src="$OPTARG"; args+=" --src=$src"
+    ;;
     h) 	help="$OPTARG"; args+=" --ua_help"
        	usage
 	exit
@@ -56,6 +59,12 @@ done
 
 # cd to location
 cd /var/www/html/advcp/
+
+# if data source is API
+if [ $src == "db" ]; then
+	echo "Writing feed...";
+	node request.js;
+fi
 
 # run spider first
 echo "Running Spider (casperjs) ... ";

@@ -1,0 +1,44 @@
+</div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="/js/jquery-1.10.2.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript  -->
+    <script src="/js/metisMenu.min.js"></script>
+   
+    <!-- Custom Theme JavaScript -->
+    <script src="/js/sb-admin-2.js"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $('#btnRun').click(function() {
+            var email = $('#email').val();
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if(re.test(email)) {
+                $('#btnRun').hide();
+		$.get('http://localhost:3000/process?email=' + $('#email').val(), function(result) {
+                	$('#msg').html('Running bot ... '); 
+            	});
+                $('#status').html("An email with the report will be sent to " + email + " upon completion.");
+                $('#email-error').hide();
+            } else {
+                $('#email-error').html('Please enter a valid email');
+                $('#status').html('');
+                return;
+            }
+        });
+    });
+    </script>
+</body>
+
+</html>
+

@@ -29,7 +29,11 @@ Platform: CentOs 7 64bit / nodejs / phantomjs / casperjs
 1.6) npm install pkgcloud
 1.7) npm install node-import
 1.8) npm install path
-1.9) npm install shelljs
+1.9) npm install express
+1.10) sudo npm install mysql
+1.11) sudo npm install request
+1.12) sudo npm install body-parser
+1.13) sudo npm install ejs
 
 2) Install Phantomjs:
 2.1) npm install phantomjs
@@ -47,8 +51,11 @@ CONFIG:
 
 RUN:
 ----
+0) forever start /var/www/html/advcp/server.js or `cd /var/www/html/advcp; node server.js &` (starts the API)
 using the wrapper (runs all modules in a sequence):
 1) /bin/bash main.sh - main wrapper 
+or
+2) http://{hostname}:3000 - select "Run Bot" from the UI
 
 using each module:
 1) casperjs --ignore-ssl-errors=true [OPTIONS] crawler.js
@@ -61,6 +68,7 @@ Options:
 --delim={delimiter} delimiter character for feed parsing (default: ",")
 --logfile={logfile} log file name
 --ua_help prints available user-agent options
+--src data source for feed generation for bot (file|db default file)
 --ua={UA_KEY} use specified user-agent (ex: --ua=Chrome41/Win7)
 
 Enjoy!
