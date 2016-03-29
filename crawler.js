@@ -152,11 +152,33 @@ function crawl(ua_key, urls) {
   
             var file    = util.format('%s_%s_%s', aid, cid, cname);
             var loc_img = util.format('screenshots/%s_%s_%sx%s.png',file, ua_key.replace(/\//g, "."), screen._width, screen._height);
-                        
+            
+            /* instant articles */
+            articleMetas = this.evaluate(function() {
+                var metas = [];
+                [].forEach.call(document.querySelectorAll('meta'), function(elem) {
+                    var meta = {};
+                    [].slice.call(elem.attributes).forEach(function(attr) {
+                        if( attr.name === 'property' && (attr.value === 'article:body' || /fb:app_id/.test(attr.value) || /article:publisher/.test(attr.value)) ) {
+                            meta[attr.name] = attr.value;
+                        }
+                    });
+                    metas.push(meta);
+                });
+                return metas;
+            });
+            
+            /* found 3 conditions to flag as IA */
+            if(articleMetas.length === 3) {
+                errors.push('Facebook Instant Article');
+            }
+            
+            /* 404 */
             if(res.status == 404) {
                 errors.push('404 Error');
             }
             
+            /* 500 */
             if(res.status >= 500) {
                 errors.push('500 Error');
             }
@@ -165,6 +187,7 @@ function crawl(ua_key, urls) {
                 fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim, 
                 errors.join('|'), log_delim, errors.join('|'), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
             }
+            
             
             this.capture(loc_img, {
                 top: screen._top,
