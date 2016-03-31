@@ -7,6 +7,7 @@
 
 require('node-import');
 imports('includes/mysql.js');
+imports('includes/useragents.js');
 
 var express = require('express'),
     app     = express(),
@@ -35,50 +36,21 @@ app.set('view engine', 'ejs');
 
 /* index */
 app.get('/', function(req, res){
-  	res.render('pages/index');
+    res.render('pages/index');
 });
 
 /* run bot page */
 app.get('/run', function(req, res){
-  	res.render('pages/run');
+    res.render('pages/run', {uas: userAgents});
 });
 
 /* run bot */
 app.get('/process', function(req, res) {
-	var email = req.query.email;
-	var request = require('./process.js').Request; 
-	res.send(request(email)); 
+    var email = req.query.email;
+    var request = require('./process.js').Request; 
+    res.send(request(email)); 
 });
 
-/* socket to bot process */
-app.get('/run-bot', function(req, res) {
-    var email = req.query.email;
-    var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-s', 'file', '-f', 'feed.csv', '-u', 'Chrome41/Win7', '-r', email]);
-    io.on('connection', function(socket){
-	console.log('new socket connection');
-        console.log('report recipient: %s', email);
-	        
-	var chunk = '';
-	spw.stdout.on('data', function(data){
-		chunk += data.toString().replace('<<', '&lt;&lt;').replace('>>', '&gt;&gt;');
-                chunk.replace('<', '&lt;').replace('>', '&gt;').replace(/(?:\r\n|\r|\n)/g, '<br />');
-		socket.emit('newdata', chunk);
-	});
-	
-	spw.stderr.on('data', function (data) {
-		console.log('Failed to start child process.');
-	});
-        
-        spw.on('exit', function(code) {
-            socket.emit('close', 1);
-        });
-        
-        spw.on('error', function(e){
-            socket.emit('error', 1);
-        });
-    });
-});
-    
 /* process bot - sse */
 app.get('/exec', function(req, res){
     res.writeHead(200, { 
@@ -202,13 +174,14 @@ app.get('/campaigns', function (req, res) {
     });
 });
 
-
+/* socket to bot process */
 io.on('connection', function(socket){
-    socket.on('run', function(m) {    
-        var email = 'oren@advertise.com';
-        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-s', 'file', '-f', 'feed.csv', '-u', 'Chrome41/Win7', '-r', email]);
+    socket.on('run', function(params) {    
+        var source  = params.src || 'file';
+        var ua      = params.ua || 'Chrome41/Win7';
+        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-s', source, '-f', 'feed.csv', '-u', ua, '-r', params.email]);
 	console.log('running bot...');
-        console.log('report recipient: %s', email);
+        console.log('params: %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source);
 	        
 	var chunk = '';
 	spw.stdout.on('data', function(data){

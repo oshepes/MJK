@@ -7,6 +7,24 @@
                            	<small>ADVCP BOT</small>
 	                   </h1>
                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label style="font-weight: 400" for="src">Data Source</label>
+                                        <select class="form-control" name="src" id="src">
+                                            <option value="file">File</option>
+                                            <option value="db">Database</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label style="font-weight: 400" for="src">User Agent (Browser)</label>
+                                        <select class="form-control" name="ua" id="ua">
+                                        <% Object.keys(uas).forEach(function(u) { %>
+                                            <option value="<%= u %>"><%= u %></a></option>
+    					<% }); %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="clear:both" /><br/>
                                 <!-- upload form -->
                                 <div class="form-group" id="chkContainer">
                                     <input type="checkbox" id="chkUpload" name="chkUpload" /> <label style="font-weight: 400" for="chkUpload">Upload Feed</label>
