@@ -34,6 +34,7 @@ Platform: CentOs 7 64bit / nodejs / phantomjs / casperjs
 1.11) sudo npm install request
 1.12) sudo npm install body-parser
 1.13) sudo npm install ejs
+1.14) sudo npm install multer
 
 2) Install Phantomjs:
 2.1) npm install phantomjs
@@ -55,7 +56,7 @@ RUN:
 using the wrapper (runs all modules in a sequence):
 1) /bin/bash main.sh - main wrapper 
 or
-2) http://{hostname}:3000 - select "Run Bot" from the UI
+2) http://{hostname}:8080 - select "Run Bot" from the UI
 
 using each module:
 1) casperjs --ignore-ssl-errors=true [OPTIONS] crawler.js

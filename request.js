@@ -10,7 +10,7 @@ var util 	= require('util');
 var request 	= require('request');
 
 // API endpoint
-var endpoint	= 'http://localhost:3000/campaigns';
+var endpoint	= 'http://localhost:8080/campaigns';
 
 // feed config
 var feed 	= 'data/feed.csv';

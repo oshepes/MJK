@@ -15,6 +15,7 @@ var express = require('express'),
     cp      = require('child_process'),
     parser  = require('body-parser'),
     fs      = require('fs'),
+    multer  = require('multer'),
     connectionpool = mysql.createPool({
         host     : mysql_cfg.MYSQL_HOST,
         user     : mysql_cfg.MYSQL_USER,
@@ -22,15 +23,15 @@ var express = require('express'),
         database : mysql_cfg.MYSQL_DB
     });
 
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+    
 /* config */
 app.use(express.static(path.join(__dirname, '/')));
 app.use(parser.urlencoded({ extended: false }));
 app.use(parser.json());
 app.set('view engine', 'ejs');
 
-/* clients */
-clients = {};
-clientId = 0;
 
 /* index */
 app.get('/', function(req, res){
@@ -49,7 +50,36 @@ app.get('/process', function(req, res) {
 	res.send(request(email)); 
 });
 
-/* process bot */
+/* socket to bot process */
+app.get('/run-bot', function(req, res) {
+    var email = req.query.email;
+    var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-s', 'file', '-f', 'feed.csv', '-u', 'Chrome41/Win7', '-r', email]);
+    io.on('connection', function(socket){
+	console.log('new socket connection');
+        console.log('report recipient: %s', email);
+	        
+	var chunk = '';
+	spw.stdout.on('data', function(data){
+		chunk += data.toString().replace('<<', '&lt;&lt;').replace('>>', '&gt;&gt;');
+                chunk.replace('<', '&lt;').replace('>', '&gt;').replace(/(?:\r\n|\r|\n)/g, '<br />');
+		socket.emit('newdata', chunk);
+	});
+	
+	spw.stderr.on('data', function (data) {
+		console.log('Failed to start child process.');
+	});
+        
+        spw.on('exit', function(code) {
+            socket.emit('close', 1);
+        });
+        
+        spw.on('error', function(e){
+            socket.emit('error', 1);
+        });
+    });
+});
+    
+/* process bot - sse */
 app.get('/exec', function(req, res){
     res.writeHead(200, { 
 	"Content-Type": "text/event-stream",
@@ -72,19 +102,25 @@ app.get('/exec', function(req, res){
     });
 });
 
-/* events */
-app.get('/events/', function(req, res) {
-	req.socket.setTimeout(Infinity);
-    	res.writeHead(200, {
-    		'Content-Type': 'text/event-stream',
-    		'Cache-Control': 'no-cache',
-    		'Connection': 'keep-alive'
-   	 });
-    	res.write('\n');
-    	(function(clientId) {
-        	clients[clientId] = res; 
-        	req.on("close", function() {delete clients[clientId]}); 
-    	})(++clientId)
+/* upload */
+app.post('/upload/feed', function(req, res) {
+	var storage =   multer.diskStorage({
+        	destination: function (req, file, callback) {
+                	callback(null, './data');
+        	},
+        	filename: function (req, file, callback) {
+                	callback(null, 'feed.csv'); // TODO: timestamp: + Date.now());
+        	}
+	});
+	var upload = multer({storage : storage}).single('feed');
+
+	upload(req, res, function(err) {
+       	 	if(err) {
+            		return res.end("Error uploading file: " + err);
+        	}
+        	res.end("File upload completed.");
+    	});
+
 });
 
 /* reports */
@@ -168,9 +204,12 @@ app.get('/campaigns', function(req, res) {
     });
 });
 
-/* TODO: implement rest of CRUD */
+/* socket */
+var socket_io = 8000, port = 8080;
+http.listen(8000, function(){
+	console.log('Opening socket on port %d', socket_io);
+});
 
-/* start listening */
-app.listen(3000);
-
-console.log('Starting server on port 3000');
+/* start listening app server */
+app.listen(port);
+console.log('Starting HTTP server on port %d', port);

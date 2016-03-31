@@ -1,0 +1,35 @@
+    <script>
+    $(document).ready(function() {
+        $('#chkUpload').change(function() {
+            if(this.checked) $('#uploadForm').show();
+            else $('#uploadForm').hide();
+        });
+
+        $('#uploadForm').submit(function(e) {
+            if($("#file").val() == '') {
+                e.preventDefault();
+                $('#upstatus').html('Please select a file to upload');
+                $('#upstatus').addClass('alert-danger');
+                return false;
+            }
+
+            $("#upstatus").empty().text("File is uploading...");
+            $(this).ajaxSubmit({
+                error: function(xhr) {
+                    console.log(xhr.status);
+                    status(xhr.status);
+                    $('#upstatus').removeClass('alert-success');
+                    $('#upstatus').addClass('alert-danger');
+                },
+                success: function(response) {
+                    $("#upstatus").empty().text(response);
+                    $('#upstatus').removeClass('alert-danger');
+                    $('#upstatus').addClass('alert-success');
+                    $('#btnUpload').hide();
+                    console.log(response);
+                }
+            });
+        return false;
+        });    
+    });
+    </script>
