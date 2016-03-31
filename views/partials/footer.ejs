@@ -63,6 +63,7 @@
             var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             if(re.test(email)) {
                 var socket = io('http://localhost:8000');
+                socket.emit('run', 1);
                 socket.on('newdata', function(d){
                     $('#botstatus').html(d);
                 });
@@ -71,11 +72,11 @@
                     $('#msg').addClass('alert alert-success');
                     $('#msg').html('&nbsp;&nbsp;<span class="icon-large icon-ok"></span> Bot process completed.');
                 });
-
+                /*
                 $.get('http://localhost:8080/run-bot?email=' + $('#email').val(), function(result) {
                  	// open socket
              	});
-
+                */
                 $('#chkContainer').hide();
                 $('#uploadFormCont').hide();
                 $('#btnRun').hide();

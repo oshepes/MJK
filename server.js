@@ -104,103 +104,130 @@ app.get('/exec', function(req, res){
 
 /* upload */
 app.post('/upload/feed', function(req, res) {
-	var storage =   multer.diskStorage({
-        	destination: function (req, file, callback) {
-                	callback(null, './data');
-        	},
-        	filename: function (req, file, callback) {
-                	callback(null, 'feed.csv'); // TODO: timestamp: + Date.now());
-        	}
-	});
-	var upload = multer({storage : storage}).single('feed');
+    var storage =   multer.diskStorage({
+        destination: function (req, file, callback) {
+            callback(null, './data');
+        },
+        filename: function (req, file, callback) {
+            callback(null, 'feed.csv'); // TODO: timestamp: + Date.now());
+        }
+    });
+    var upload = multer({storage : storage}).single('feed');
 
-	upload(req, res, function(err) {
-       	 	if(err) {
-            		return res.end("Error uploading file: " + err);
-        	}
-        	res.end("File upload completed.");
-    	});
-
+    upload(req, res, function(err) {
+        if(err) {
+            return res.end("Error uploading file: " + err);
+        }
+        res.end("File upload completed.");
+    });
 });
 
 /* reports */
 app.get('/reports', function(req, res){
-	try {
-           fs.readdir(__dirname + '/logs/', function (err, files) {
-                if (err) throw err;
-                list = [];
-                files.forEach(function (file) {
-                        list.push(file);
-                });
-  		res.render('pages/reports', {
-			"files": list
-		});
-           });
-        } catch(e) {
-                console.log(e);
-        }
-
+    try {
+        fs.readdir(__dirname + '/logs/', function (err, files) {
+            if (err) throw err;
+            list = [];
+            files.forEach(function (file) {
+                list.push(file);
+            });
+            res.render('pages/reports', {
+		"files": list
+            });
+        });
+    } catch(e) {
+        console.log(e);
+    }
 });
 
 /* report list */
 app.get('/list', function(req, res) {
-	try {
-	   fs.readdir(__dirname + '/logs/', function (err, files) {
-  		if (err) throw err;
-		list = [];
-   		files.forEach(function (file) {
-      			list.push("<li><a href='/logs/" + file + "'>" + file + "</a></li>");
-     		});
-	   	res.send(list);
-   	   });
-	} catch(e) {
-		console.log(e);
-	}
+    try {
+        fs.readdir(__dirname + '/logs/', function (err, files) {
+            if (err) throw err;
+            list = [];
+            files.forEach(function (file) {
+                list.push("<li><a href='/logs/" + file + "'>" + file + "</a></li>");
+            });
+            res.send(list);
+   	});
+    } catch(e) {
+    	console.log(e);
+    }
 });
 
 /* get campaigns */
-app.get('/campaigns', function(req, res) {
-    	connectionpool.getConnection(function(err, connection) {
+app.get('/campaigns', function (req, res) {
+    connectionpool.getConnection(function (err, connection) {
         if (err) {
-            console.error('CONNECTION error: ',err);
+            console.error('CONNECTION error: ', err);
             res.statusCode = 503;
             res.send({
                 result: 'error',
-                err:    err.code
+                err: err.code
             });
         } else {
-	    var sql = "SELECT A.id AS AccID, A.name AS Account,C.name AS CampName, AG.name AS AdgrpName, U.user_name, AD.destination_url " +
-                            "FROM adgroup_property AP " +
-                            "LEFT JOIN property P ON (AP.property_id = P.id) " +
-                            "LEFT JOIN adgroup AG ON (AP.adgroup_id = AG.id) " +
-                            "LEFT JOIN ad AD ON (AG.id = AD.adgroup_id) " +
-                            "LEFT JOIN campaign C ON (AG.campaign_id = C.id) " + 
-                            "LEFT JOIN account A ON (C.account_id = A.id) " +
-                            "LEFT JOIN user U ON (A.rep_user_id = U.id) WHERE " +
-                            "A.name NOT LIKE 'qatest%' " +
-                            "AND C.status_id = 7 " +
-                            "AND A.status = 7 " +
-                            "AND AG.status_id = 7 " +
-                            "AND AD.status_id = 7 LIMIT 1500"; 
-            connection.query(sql, function(err, rows, fields) {
+            var sql = "SELECT A.id AS AccID, A.name AS Account,C.name AS CampName, AG.name AS AdgrpName, U.user_name, AD.destination_url " +
+                    "FROM adgroup_property AP " +
+                    "LEFT JOIN property P ON (AP.property_id = P.id) " +
+                    "LEFT JOIN adgroup AG ON (AP.adgroup_id = AG.id) " +
+                    "LEFT JOIN ad AD ON (AG.id = AD.adgroup_id) " +
+                    "LEFT JOIN campaign C ON (AG.campaign_id = C.id) " +
+                    "LEFT JOIN account A ON (C.account_id = A.id) " +
+                    "LEFT JOIN user U ON (A.rep_user_id = U.id) WHERE " +
+                    "A.name NOT LIKE 'qatest%' " +
+                    "AND C.status_id = 7 " +
+                    "AND A.status = 7 " +
+                    "AND AG.status_id = 7 " +
+                    "AND AD.status_id = 7 LIMIT 1500";
+            connection.query(sql, function (err, rows, fields) {
                 if (err) {
                     console.error(err);
                     res.statusCode = 500;
                     res.send({
                         result: 'error',
-                        err:    err.code
+                        err: err.code
                     });
                 }
                 res.send({
                     result: 'success',
-                    err:    '',
+                    err: '',
                     fields: fields,
-                    json:   rows,
+                    json: rows,
                     length: rows.length
                 });
                 connection.release();
             });
         }
+    });
+});
+
+
+io.on('connection', function(socket){
+    socket.on('run', function(m) {    
+        var email = 'oren@advertise.com';
+        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-s', 'file', '-f', 'feed.csv', '-u', 'Chrome41/Win7', '-r', email]);
+	console.log('running bot...');
+        console.log('report recipient: %s', email);
+	        
+	var chunk = '';
+	spw.stdout.on('data', function(data){
+            chunk += data.toString().replace('<<', '&lt;&lt;').replace('>>', '&gt;&gt;');
+            chunk.replace('<', '&lt;').replace('>', '&gt;').replace(/(?:\r\n|\r|\n)/g, '<br />');
+            io.emit('newdata', chunk);
+	});
+	
+	spw.stderr.on('data', function (data) {
+            //console.log('Failed to start child process.');
+	});
+        
+        spw.on('exit', function(code) {
+            io.emit('close', 1);
+        });
+        
+        spw.on('error', function(e){
+            io.emit('error', 1);
+        });
     });
 });
 
