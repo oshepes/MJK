@@ -73,21 +73,6 @@
 				</includes>
 				<targetPath>${project.build.outputDirectory}/includes</targetPath>
 			</resource>
-                        <resource>
-				<directory>${project.basedir}/conf</directory>
-				<filtering>true</filtering>
-				<excludes>
-				<exclude>*.ejs</exclude>
-				</excludes>
-			</resource>
-			<resource>
-				<directory>${project.basedir}/conf</directory>
-				<filtering>true</filtering>
-				<includes>
-				<include>*.ejs</include>
-				</includes>
-				<targetPath>${project.build.outputDirectory}/views/partials</targetPath>
-			</resource>
 		</resources>
 		
 	</build>
