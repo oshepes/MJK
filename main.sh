@@ -31,7 +31,7 @@ usage() {
 
 args=""
 
-while getopts ":f:d:l:u:r:s:m:h" opt; do
+while getopts ":f:d:l:u:r:s:m:o:t:h" opt; do
   case $opt in
     f) 	feed="$OPTARG"; args+=" --feed=$feed"
     ;;
@@ -46,6 +46,10 @@ while getopts ":f:d:l:u:r:s:m:h" opt; do
     m) 	log_delim="$OPTARG"; args+=" --log_delim=$log_delim"
     ;;
     s) 	src="$OPTARG"; args+=" --src=$src"
+    ;;
+    o)  offset="$OPTARG"; 
+    ;;
+    t)  limit="$OPTARG";
     ;;
     h) 	help="$OPTARG"; args+=" --ua_help"
        	usage
@@ -63,7 +67,7 @@ cd /var/www/html/advcp/
 # if data source is API
 if [ $src == "db" ]; then
 	echo "Writing feed...";
-	node request.js;
+	node request.js $offset $limit;
 fi
 
 # run spider first

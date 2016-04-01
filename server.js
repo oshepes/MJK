@@ -8,6 +8,7 @@
 require('node-import');
 imports('includes/mysql.js');
 imports('includes/useragents.js');
+imports('includes/config.js');
 
 var express = require('express'),
     app     = express(),
@@ -17,6 +18,7 @@ var express = require('express'),
     parser  = require('body-parser'),
     fs      = require('fs'),
     multer  = require('multer'),
+    util    = require('util'),
     connectionpool = mysql.createPool({
         host     : mysql_cfg.MYSQL_HOST,
         user     : mysql_cfg.MYSQL_USER,
@@ -36,12 +38,12 @@ app.set('view engine', 'ejs');
 
 /* index */
 app.get('/', function(req, res){
-    res.render('pages/index');
+    res.render('pages/index', {"socket_io": config.ADV_SOCKET});
 });
 
 /* run bot page */
 app.get('/run', function(req, res){
-    res.render('pages/run', {uas: userAgents});
+    res.render('pages/run', {uas: userAgents, socket_io: config.ADV_SOCKET});
 });
 
 /* run bot */
@@ -109,7 +111,8 @@ app.get('/reports', function(req, res){
                 list.push(file);
             });
             res.render('pages/reports', {
-		"files": list
+		"files": list,
+                "socket_io": config.ADV_SOCKET
             });
         });
     } catch(e) {
@@ -134,7 +137,9 @@ app.get('/list', function(req, res) {
 });
 
 /* get campaigns */
-app.get('/campaigns', function (req, res) {
+app.get('/campaigns/:offset/:limit', function (req, res) {
+    var offset = req.params.offset || 0;
+    var limit = req.params.limit || 1000;
     connectionpool.getConnection(function (err, connection) {
         if (err) {
             console.error('CONNECTION error: ', err);
@@ -144,7 +149,7 @@ app.get('/campaigns', function (req, res) {
                 err: err.code
             });
         } else {
-            var sql = "SELECT A.id AS AccID, A.name AS Account,C.name AS CampName, AG.name AS AdgrpName, U.user_name, AD.destination_url " +
+            var sql = util.format("SELECT A.id AS AccID, A.name AS Account,C.name AS CampName, AG.name AS AdgrpName, U.user_name, AD.destination_url " +
                     "FROM adgroup_property AP " +
                     "LEFT JOIN property P ON (AP.property_id = P.id) " +
                     "LEFT JOIN adgroup AG ON (AP.adgroup_id = AG.id) " +
@@ -156,7 +161,7 @@ app.get('/campaigns', function (req, res) {
                     "AND C.status_id = 7 " +
                     "AND A.status = 7 " +
                     "AND AG.status_id = 7 " +
-                    "AND AD.status_id = 7 LIMIT 1500";
+                    "AND AD.status_id = 7 LIMIT %d, %d", offset, limit);
             connection.query(sql, function (err, rows, fields) {
                 if (err) {
                     console.error(err);
@@ -173,6 +178,7 @@ app.get('/campaigns', function (req, res) {
                     json: rows,
                     length: rows.length
                 });
+                console.log('recieved %d rows from db', rows.length);
                 connection.release();
             });
         }
@@ -184,9 +190,12 @@ io.on('connection', function(socket){
     socket.on('run', function(params) {    
         var source  = params.src || 'file';
         var ua      = params.ua || 'Chrome41/Win7';
+        var offset  = params.offset || 0;
+        var limit   = params.limit || 1000;
+        
         var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-s', source, '-f', 'feed.csv', '-u', ua, '-r', params.email]);
 	console.log('running bot...');
-        console.log('params: %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source);
+        console.log('params: %s=%s, %s=%s, %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source, 'offset', offset, 'limit', limit);
 	        
 	var chunk = '';
 	spw.stdout.on('data', function(data){

@@ -68,6 +68,14 @@
                         <resource>
 				<directory>${project.basedir}/conf</directory>
 				<filtering>true</filtering>
+				<includes>
+				<include>config.js</include>
+				</includes>
+				<targetPath>${project.build.outputDirectory}/includes</targetPath>
+			</resource>
+                        <resource>
+				<directory>${project.basedir}/conf</directory>
+				<filtering>true</filtering>
 				<excludes>
 				<exclude>*.ejs</exclude>
 				</excludes>
@@ -95,7 +103,7 @@
 				<adv.hosturl>http://compliance.advertise.com:8080</adv.hosturl>
                                 <adv.socket>http://compliance.advertise.com:8000</adv.socket>
 				<adv.domain>advcp.com</adv.domain>
-				<site_name>ADVCP</site_name>
+				<adv.site_name>ADVCP</adv.site_name>
 				<debug_level>1</debug_level>
 			</properties>
 		</profile>
@@ -110,7 +118,7 @@
                                 <adv.hosturl>http://qa1.compliance.advertise.com:8080</adv.hosturl>
                                 <adv.socket>http://qa1.compliance.advertise.com:8000</adv.socket>
                                 <adv.domain>advcp.com</adv.domain>
-                                <site_name>ADVCP</site_name>
+                                <adv.site_name>ADVCP</adv.site_name>
                                 <debug_level>1</debug_level>
 			</properties>
 		</profile>
@@ -125,7 +133,7 @@
                                 <adv.hosturl>http://localhost:8080</adv.hosturl>
                                 <adv.socket>http://localhost:8000</adv.socket>
                                 <adv.domain>advcp.com</adv.domain>
-                                <site_name>ADVCP</site_name>
+                                <adv.site_name>ADVCP</adv.site_name>
                                 <debug_level>1</debug_level>
 			</properties>
 		</profile>

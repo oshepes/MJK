@@ -19,12 +19,25 @@
                                         <label style="font-weight: 400" for="src">User Agent (Browser)</label>
                                         <select class="form-control" name="ua" id="ua">
                                         <% Object.keys(uas).forEach(function(u) { %>
-                                            <option value="<%= u %>"><%= u %></a></option>
+                                            <option value="<%= u %>"><%= u %></option>
     					<% }); %>
                                         </select>
                                     </div>
                                 </div>
                                 <div style="clear:both" /><br/>
+                                <!-- db options -->
+                                <div class="form-group" style="display: none" id="dbContainer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label style="font-weight: 400" for="offset">Offset (start)</label>
+                                        <input class="form-control" name="offset" id="offset" value="0" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label style="font-weight: 400" for="limit">Limit (end)</label>
+                                        <input class="form-control" name="limit" id="limit" value="1000" />
+                                    </div>
+                                </div>
+                                </div>
                                 <!-- upload form -->
                                 <div class="form-group" id="chkContainer">
                                     <input type="checkbox" id="chkUpload" name="chkUpload" /> <label style="font-weight: 400" for="chkUpload">Upload Feed</label>
