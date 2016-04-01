@@ -90,6 +90,11 @@ app.post('/upload/feed', function(req, res) {
         if(err) {
             return res.end("Error uploading file: " + err);
         }
+        try {
+            fs.chmodSync('data/feed.csv', '777');
+        } catch(e) {
+            console.log('Error: %s', e.stack);
+        }
         res.end("File upload completed.");
     });
 });
@@ -187,6 +192,7 @@ io.on('connection', function(socket){
 	spw.stdout.on('data', function(data){
             chunk += data.toString().replace('<<', '&lt;&lt;').replace('>>', '&gt;&gt;');
             chunk.replace('<', '&lt;').replace('>', '&gt;').replace(/(?:\r\n|\r|\n)/g, '<br />');
+            console.log('%s', chunk);
             io.emit('newdata', chunk);
 	});
 	
@@ -206,10 +212,11 @@ io.on('connection', function(socket){
 
 /* socket */
 var socket_io = 8000, port = 8080;
-http.listen(8000, function(){
+http.listen(socket_io, function(){
 	console.log('Opening socket on port %d', socket_io);
 });
 
 /* start listening app server */
-app.listen(port);
-console.log('Starting HTTP server on port %d', port);
+app.listen(port, function() {
+    console.log('Starting HTTP server on port %d', port);
+});

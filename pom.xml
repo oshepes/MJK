@@ -65,6 +65,21 @@
 				</includes>
 				<targetPath>${project.build.outputDirectory}/includes</targetPath>
 			</resource>
+                        <resource>
+				<directory>${project.basedir}/conf</directory>
+				<filtering>true</filtering>
+				<excludes>
+				<exclude>*.ejs</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>${project.basedir}/conf</directory>
+				<filtering>true</filtering>
+				<includes>
+				<include>*.ejs</include>
+				</includes>
+				<targetPath>${project.build.outputDirectory}/views/partials</targetPath>
+			</resource>
 		</resources>
 		
 	</build>
@@ -77,7 +92,8 @@
 				<advdb.password>lastchance</advdb.password>
 				<advdb.database>advertisedb</advdb.database>
 				<advenv>production</advenv>
-				<adv.hosturl>http://advcp.com</adv.hosturl>
+				<adv.hosturl>http://compliance.advertise.com:8080</adv.hosturl>
+                                <adv.socket>http://compliance.advertise.com:8000</adv.socket>
 				<adv.domain>advcp.com</adv.domain>
 				<site_name>ADVCP</site_name>
 				<debug_level>1</debug_level>
@@ -91,7 +107,23 @@
                                 <advdb.password>lastchance</advdb.password>
                                 <advdb.database>advertisedb</advdb.database>
                                 <advenv>qa</advenv>
-                                <adv.hosturl>http://qa1.advcp.com</adv.hosturl>
+                                <adv.hosturl>http://qa1.compliance.advertise.com:8080</adv.hosturl>
+                                <adv.socket>http://qa1.compliance.advertise.com:8000</adv.socket>
+                                <adv.domain>advcp.com</adv.domain>
+                                <site_name>ADVCP</site_name>
+                                <debug_level>1</debug_level>
+			</properties>
+		</profile>
+                <profile>
+			<id>dev</id>
+			<properties>
+				<advdb.hostname>localhost:3306</advdb.hostname>
+                                <advdb.username>root</advdb.username>
+                                <advdb.password>lastchance</advdb.password>
+                                <advdb.database>advertisedb</advdb.database>
+                                <advenv>dev</advenv>
+                                <adv.hosturl>http://localhost:8080</adv.hosturl>
+                                <adv.socket>http://localhost:8000</adv.socket>
                                 <adv.domain>advcp.com</adv.domain>
                                 <site_name>ADVCP</site_name>
                                 <debug_level>1</debug_level>
