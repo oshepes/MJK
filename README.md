@@ -4,7 +4,7 @@
 ##since: 2/17/16
 
 ```
-**DESCRIPTION:**
+DESCRIPTION:
 This utility will crawl a given set of URLs and verify the following conditions are met on 
 the designated target URLs:
 - 1) NO javascript alerts or dialogs 
@@ -12,7 +12,7 @@ the designated target URLs:
 - 3) NO auto sound play
 - 4) NO download triggers
 
-**INSTALL:**
+INSTALL:
 Platform: CentOs 7 64bit / nodejs / phantomjs / casperjs
 1. Install nodejs: 
   1.1 curl --silent --location https://rpm.nodesource.com/setup_5.x | bash -
@@ -35,26 +35,26 @@ Platform: CentOs 7 64bit / nodejs / phantomjs / casperjs
 3. Install Casperjs:
   3.1 npm install -g casperjs
 
-##CONFIG:##
+CONFIG:
 User-agent config file is located at `includes/useragents.js`
 Feed of URLs to process is located at `data/feed.csv`
 Allow Gmail access from less secure clients (i.e: node), https://www.google.com/settings/security/lesssecureapps
 Output file is configured w/ --logfile switch (default: logs/{datestamp}.csv)
 Mail config is under includes/mail_cfg.js
 
-##RUN:##
+RUN:
 1. forever start /var/www/html/advcp/server.js or `cd /var/www/html/advcp; node server.js &` (starts the API)
 using the wrapper (runs all modules in a sequence):
 2. /bin/bash main.sh - main wrapper (post deploy needs to grant main.sh execute perms)
 or
 3. http://{hostname}:8080 - select "Run Bot" from the UI
 
-##Using each module:##
+Using each module:
 1. casperjs --ignore-ssl-errors=true [OPTIONS] crawler.js
 2. for x in `ls screenshots/`; do node sync_to_cdn.js screenshots/$x; done;
 3. node mailer.js
 
-##Options:##
+Options:
 --feed={feed} feed file name
 --delim={delimiter} delimiter character for feed parsing (default: ",")
 --logfile={logfile} log file name
