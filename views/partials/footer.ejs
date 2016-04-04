@@ -32,6 +32,7 @@
             } else {
                 $('#chkContainer').hide();
                 $('#dbContainer').show();
+                $('#uploadFormCont').hide();
             }
         });
 
@@ -76,7 +77,6 @@
             var limit   = $('#limit').val();
 
             if(source == 'db') {
-                $('#chkContainer').hide();
                 var regex = /^\d+$/;
                 if(!regex.test(offset)) {
                     $('#email-error').addClass('alert alert-danger');
