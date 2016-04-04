@@ -7,10 +7,13 @@
 # @since: 3/1/16
 # ------------------------------------------
 
-# get command line options (casperjs)
+# get command line options
 # --f={feed} feed file name
 # --d={delimiter} delimiter character for feed parsing (def: ",")
 # --l={logfile} log file name
+# --l={logfile} log file name
+# --o={offset} offset position in db resultset
+# --t={limit} number of records to fetch
 # --h print available user-agent options
 # --u={UA_KEY} use specified user-agent (ex: --ua=Chrome41/Win7)
 
@@ -22,6 +25,8 @@ usage() {
 	echo "-u user-agent to use in spider (use key from object below)"
 	echo "-r email recipient of report"
 	echo "-s data source (db|file) the above -f is ignored if this is set"
+	echo "-o offset in resultset from db"
+	echo "-t number of records from db resultset"
 	echo "-h help"
 	echo ""
 	echo "User Agents:"
