@@ -24,8 +24,8 @@ Platform: CentOs 7 64bit / nodejs / phantomjs / casperjs
 1.1) curl --silent --location https://rpm.nodesource.com/setup_5.x | bash -
 1.2) yum install nodejs
 1.3) npm install csv-parser (or) npm install papaparse
-1.4) npm install -g forever (optional)
-1.5) npm install -g nodemailer
+1.4) npm install -g forever
+1.5) npm install nodemailer
 1.6) npm install pkgcloud
 1.7) npm install node-import
 1.8) npm install path
