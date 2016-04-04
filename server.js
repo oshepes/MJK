@@ -53,29 +53,6 @@ app.get('/process', function(req, res) {
     res.send(request(email)); 
 });
 
-/* process bot - sse */
-app.get('/exec', function(req, res){
-    res.writeHead(200, { 
-	"Content-Type": "text/event-stream",
-        "Cache-control": "no-cache",
-	"Connection": "keep-alive"
-    });
-
-    var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-s', 'file', '-f', 'feed.csv', '-u', 'Chrome41/Win7', '-r', 'oren@advertise.com']),
-    str = "";
-
-    spw.stdout.on('data', function (data) {
-        str += data.toString();
-        // status
-        console.log(str);
-	res.write(str);
-    });
-   
-    spw.on('close', function (code) {
-    	res.end(str);
-    });
-});
-
 /* upload */
 app.post('/upload/feed', function(req, res) {
     var storage =   multer.diskStorage({
@@ -162,9 +139,10 @@ app.get('/campaigns/:offset/:limit', function (req, res) {
                     "AND A.status = 7 " +
                     "AND AG.status_id = 7 " +
                     "AND AD.status_id = 7 LIMIT %d, %d", offset, limit);
+            console.log('Query: %s', sql);
             connection.query(sql, function (err, rows, fields) {
                 if (err) {
-                    console.error(err);
+                    console.error('DB Error: %s', err);
                     res.statusCode = 500;
                     res.send({
                         result: 'error',
@@ -193,7 +171,7 @@ io.on('connection', function(socket){
         var offset  = params.offset || 0;
         var limit   = params.limit || 1000;
         
-        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-s', source, '-f', 'feed.csv', '-u', ua, '-r', params.email]);
+        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', 'feed.csv', '-u', ua, '-r', params.email]);
 	console.log('running bot...');
         console.log('params: %s=%s, %s=%s, %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source, 'offset', offset, 'limit', limit);
 	        

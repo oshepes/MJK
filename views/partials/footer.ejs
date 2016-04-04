@@ -68,6 +68,7 @@
         });    
 
         $('#btnRun').on('click', function(e) {   
+            
             var email   = $('#email').val();
             var ua      = $('#ua').val();
             var source  = $('#src').val();
@@ -99,6 +100,8 @@
                 });
 
                 socket.on('close', function(d){
+                    $('#msg').removeClass('alert-info');
+                    $('#email-error').removeClass('alert-danger');
                     $('#msg').addClass('alert alert-success');
                     $('#msg').html('&nbsp;&nbsp;<span class="icon-large icon-ok"></span> Bot process completed @ ' + new Date());
                 });
