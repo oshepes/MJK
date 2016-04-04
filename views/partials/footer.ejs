@@ -67,12 +67,28 @@
             return false;
         });    
 
-        $('#btnRun').on('click', function(e) {      
+        $('#btnRun').on('click', function(e) {   
             var email   = $('#email').val();
             var ua      = $('#ua').val();
             var source  = $('#src').val();
             var offset  = $('#offset').val();
             var limit   = $('#limit').val();
+
+            if(source == 'db') {
+                $('#chkContainer').hide();
+                var regex = /^\d+$/;
+                if(!regex.test(offset)) {
+                    $('#email-error').addClass('alert alert-danger');
+                    $('#email-error').html('Offset value has to be greater than 0');
+                    return false;
+                }
+                
+                if(!regex.test(limit) || limit > 2000) {
+                    $('#email-error').addClass('alert alert-danger');
+                    $('#email-error').html('Limit value has to be between 0 and 2000');
+                    return false;
+                }
+            }
 
             var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             if(re.test(email)) {
@@ -91,11 +107,13 @@
                 $('#uploadFormCont').hide();
                 $('#btnRun').hide();
                 $('#botstatus').show();
-		$('#msg').html('Running bot ... please wait'); 
+                $('#msg').addClass('alert alert-info');
+		$('#msg').html('&nbsp;&nbsp;Running bot ... please wait'); 
                 $('#email-error').hide();
             } else {
                 $('#chkUpload').show();
-                $('#chkContainer').show();
+                if(source !== 'db') $('#chkContainer').show();
+                $('#email-error').addClass('alert alert-danger');
                 $('#email-error').html('Please enter a valid email');
                 $('#botstatus').html('');
                 return;
