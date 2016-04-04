@@ -80,10 +80,11 @@
 		<profile>
 			<id>production</id>
 			<properties>
-				<advdb.hostname>10.100.0.163:3306</advdb.hostname>
-				<advdb.username>root</advdb.username>
+				<advdb.hostname>10.8.2.201</advdb.hostname>
+				<advdb.username>advcp</advdb.username>
 				<advdb.password>lastchance</advdb.password>
 				<advdb.database>advertisedb</advdb.database>
+                                <advdb.port>3306</advdb.port>
 				<advenv>production</advenv>
 				<adv.hosturl>http://compliance.advertise.com:8080</adv.hosturl>
                                 <adv.socket>http://compliance.advertise.com:8000</adv.socket>
@@ -95,10 +96,11 @@
 		<profile>
 			<id>qa1</id>
 			<properties>
-				<advdb.hostname>10.100.0.163:3306</advdb.hostname>
-                                <advdb.username>root</advdb.username>
+				<advdb.hostname>10.100.2.58</advdb.hostname>
+                                <advdb.username>advcp</advdb.username>
                                 <advdb.password>lastchance</advdb.password>
                                 <advdb.database>advertisedb</advdb.database>
+                                <advdb.port>3306</advdb.port>
                                 <advenv>qa</advenv>
                                 <adv.hosturl>http://qa1.compliance.advertise.com:8080</adv.hosturl>
                                 <adv.socket>http://qa1.compliance.advertise.com:8000</adv.socket>
@@ -114,6 +116,7 @@
                                 <advdb.username>root</advdb.username>
                                 <advdb.password>lastchance</advdb.password>
                                 <advdb.database>advertisedb</advdb.database>
+                                <advdb.port>3306</advdb.port>
                                 <advenv>dev</advenv>
                                 <adv.hosturl>http://localhost:8080</adv.hosturl>
                                 <adv.socket>http://localhost:8000</adv.socket>
