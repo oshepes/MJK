@@ -40,6 +40,10 @@
             }
         });
 
+        $('#file').click(function() {
+            $('#btnUpload').show();
+        });
+
         $('#chkUpload').change(function() {
             if(this.checked) $('#uploadFormCont').show();
             else $('#uploadFormCont').hide();
@@ -49,7 +53,7 @@
             if($("#file").val() == '') {
                 e.preventDefault();
                 $('#upstatus').html('Please select a file to upload');
-                $('#upstatus').addClass('alert-danger');
+                $('#upstatus').addClass('alert alert-danger');
                 return false;
             }
 
@@ -59,12 +63,12 @@
                     console.log(xhr.status);
                     status(xhr.status);
                     $('#upstatus').removeClass('alert-success');
-                    $('#upstatus').addClass('alert-danger');
+                    $('#upstatus').addClass('alert alert-danger');
                 },
                 success: function(response) {
                     $("#upstatus").empty().text(response);
-                    $('#upstatus').removeClass('alert-danger');
-                    $('#upstatus').addClass('alert-success');
+                    $('#upstatus').removeClass('alert alert-danger');
+                    $('#upstatus').addClass('alert alert-success');
                     $('#btnUpload').hide();
                     console.log(response);
                 }
