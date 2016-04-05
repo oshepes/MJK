@@ -35,7 +35,7 @@ var report      = 'adv_report_' + log.getDate() + '.csv';
 var report_path = log.getLogFile();
 
 // create transporter object using the default SMTP transport 
-var transporter = nodemailer.createTransport('smtps://oren%40advertise.com:Or3n!1973@smtp.gmail.com');
+var transporter = nodemailer.createTransport('smtp://smtp-01.advdc.com');
 
 // setup e-mail options
 var mailOptions = {

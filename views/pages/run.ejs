@@ -1,5 +1,5 @@
 <% include ../partials/header %>
-
+<link href="/css/fileinput.min.css" rel="stylesheet">
 <!-- content area -->
 		<div class="row">
 		    <div id="list" class="col-lg-9">
@@ -45,9 +45,9 @@
                                 <div style="display:none" class="form-group" id="uploadFormCont">
                                     <form role="form" id="uploadForm" name="uploadForm" enctype="multipart/form-data" action="/upload/feed" method="post">
                                         <h6>Feed Format (CSV): AccountID, AccountName, CampaignName, AdGroupName, UserName, Code, DestinationURL</h6>
-                                        <input type="file" id="file" class="form-control upload" name="feed" placeholder="Select a feed to upload" />
+                                        <input type="file" id="file" class="file" multiple data-show-upload="false" data-show-caption="true" name="feed" placeholder="Select a feed to upload" />
                                         <div id="upstatus"></div>
-                                        <input id="btnUpload" type="submit" class="btn btn-primary" value="Upload Feed" name="submit" />
+                                        <input id="btnUpload" type="submit" class="btn btn-lg btn-block btn-primary" value="Upload Feed" name="submit" /><br/>
                                     </form>
                                 </div>
                                 <div class="form-group" id="recipientForm">
