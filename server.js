@@ -9,6 +9,7 @@ require('node-import');
 imports('includes/mysql.js');
 imports('includes/useragents.js');
 imports('includes/config.js');
+imports('includes/rackspace.js');
 
 var express = require('express'),
     app     = express(),
@@ -19,6 +20,7 @@ var express = require('express'),
     fs      = require('fs'),
     multer  = require('multer'),
     util    = require('util'),
+    pkgcloud    = require('pkgcloud'),
     connectionpool = mysql.createPool({
         host     : mysql_cfg.MYSQL_HOST,
         user     : mysql_cfg.MYSQL_USER,
@@ -80,6 +82,35 @@ app.post('/upload/feed', function(req, res) {
 
 /* reports */
 app.get('/reports', function(req, res){
+    try {
+        // CDN client
+        var client = pkgcloud.storage.createClient({
+            provider: 'rackspace',
+            username: rackspace.CDN_USER,
+            apiKey: rackspace.CDN_KEY,
+            region: rackspace.CDN_REGION
+        });
+        
+        list = [];
+        client.getFiles(rackspace.CDN_CONT, {prefix: 'logs', limit: 100}, function(err, files) {
+            files.forEach(function(file) {
+                list.push(file.name);
+            });
+            (function() {
+                res.render('pages/reports', {
+                    "files": list,
+                    "cdn_host": rackspace.CDN_IMG_HOST,
+                    "socket_io": config.ADV_SOCKET
+                });
+            })();
+        });
+    } catch(e) {
+        console.log(e);
+    }
+});
+
+/* archive */
+app.get('/archive', function(req, res){
     try {
         fs.readdir(__dirname + '/logs/', function (err, files) {
             if (err) throw err;

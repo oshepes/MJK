@@ -8,8 +8,7 @@
  * 
  * Description:
  * ------------
- * CDN image synchronizer - syncs local images to cloud filesystem
- * and cleans local images
+ * CDN synchronizer - syncs local files to cloud filesystem
  * 
  * Run:
  * ----
@@ -64,7 +63,7 @@ function sync(file, client) {
 
     dest.on('success', function(file) {
         // success
-        console.log("Successfully sync'd image file: " + file.name);
+        console.log("Success: " + file.name);
         fs.unlinkSync(file.name);
     }, file);
 

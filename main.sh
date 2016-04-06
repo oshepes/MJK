@@ -81,11 +81,6 @@ cmd="casperjs --ignore-ssl-errors=true $args crawler.js"
 echo $cmd; $cmd
 echo "Done crawling.";
 
-# sync to cdn screenshots
-echo "Synchronizing to CDN ... ";
-for x in `ls screenshots/`; do node sync_to_cdn.js screenshots/$x; done;
-echo "Done synchronizing.";
-
 # mail report
 args=""
 if [ -n "$rcpt" ]; then
@@ -95,4 +90,11 @@ echo "Sending mail ... "
 mail="node mailer.js $args"; 
 echo $mail; $mail
 echo "Done mailing.";
+
+# sync to cdn reports/screenshots
+echo "Synchronizing to CDN ... ";
+for x in `ls screenshots/`; do node sync_to_cdn.js screenshots/$x; done;
+for r in `ls logs/`; do node sync_to_cdn.js logs/$r; done;
+echo "Done synchronizing.";
+
 echo ""

@@ -8,7 +8,7 @@
                         </h1>
 				<ul>
 					<% files.forEach(function(file) { %>
-        					<li><a href="logs/<%= file %>"> <%= file %></a></li>
+        					<li><a href="<%= cdn_host %><%= file %>"> <%= file.replace('logs/',''); %></a></li>
     					<% }); %>
 				</ul>
 			</div>
