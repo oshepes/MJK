@@ -34,6 +34,7 @@
 phantom.injectJs('includes/useragents.js');
 phantom.injectJs('includes/screen.js');
 phantom.injectJs('includes/rackspace.js');
+phantom.injectJs('includes/detect.js');
 
 var fs          = require("fs");
 var dump        = require('utils').dump;
@@ -76,6 +77,7 @@ delim       = casper.cli.options.delim || delim;
 log_delim   = casper.cli.options.log_delim || log_delim;
 ua          = casper.cli.options.ua ? casper.cli.options.ua : 'Chrome41/Win7'; 
 var src     = casper.cli.options.src ? casper.cli.options.src : 'file';
+var detect  = casper.cli.options.detect ? casper.cli.options.detect : Object.keys(detect);
 
 // truncate logger
 try {

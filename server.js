@@ -8,6 +8,7 @@
 require('node-import');
 imports('includes/mysql.js');
 imports('includes/useragents.js');
+imports('includes/detect.js');
 imports('includes/config.js');
 imports('includes/rackspace.js');
 
@@ -46,7 +47,7 @@ app.get('/', function(req, res){
 
 /* run bot page */
 app.get('/run', function(req, res){
-    res.render('pages/run', {uas: userAgents, socket_io: config.ADV_SOCKET});
+    res.render('pages/run', {uas: userAgents, detect: detect, socket_io: config.ADV_SOCKET});
 });
 
 /* run bot */

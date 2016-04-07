@@ -39,29 +39,46 @@
                                     </div>
                                 </div>
                                 </div>
-                                <!-- upload form -->
-                                <div class="form-group" id="chkContainer">
-                                    <input type="checkbox" id="chkUpload" name="chkUpload" /> <label style="font-weight: 400" for="chkUpload">Upload Feed</label>
-                                </div>
-                                <div style="display:none" class="form-group" id="uploadFormCont">
-                                    <form role="form" id="uploadForm" name="uploadForm" enctype="multipart/form-data" action="/upload/feed" method="post">
-                                        <h6>Feed Format (CSV): AccountID, AccountName, CampaignName, AdGroupName, UserName, Code, DestinationURL</h6>
-                                        <input type="file" id="file" class="file" multiple data-show-upload="false" data-show-caption="true" name="feed" placeholder="Select a feed to upload" />
-                                        <div id="upstatus"></div>
-                                        <input id="btnUpload" type="submit" class="btn btn-lg btn-block btn-primary" value="Upload Feed" name="submit" /><br/>
-                                    </form>
-                                </div>
-                                <div class="form-group" id="recipientForm">
-                                    <form role="form" method="post" id="bot" name="bot">
-                                        <div class="form-group" id="email-error"></div>
-                                        <div class="form-group" id="msg">
-                                            <input class="form-control" id="email" required placeholder="E-mail recipient" data-error="Please enter your email" name="email" type="email" autofocus>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <!-- upload form -->
+                                        <div class="form-group" id="chkContainer">
+                                            <input type="checkbox" id="chkUpload" name="chkUpload" /> <label style="font-weight: 400" for="chkUpload">Upload Feed</label>
                                         </div>
-                                        <a class="btn btn-lg btn-primary btn-block" id="btnRun">Run Bot</a>
-                                        <div class="form-group">
-                                            <pre style="display:none" id="botstatus"></pre>
-                                        </div>
-                                    </form>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label style="font-weight: 400" for="src">Violations</label>
+                                        <select class="form-control" name="detect" id="detect" multiple="multiple">
+                                        <% Object.keys(detect).forEach(function(d) { %>
+                                            <option <% if(d.indexOf('JSPOP') !== -1) { %>selected="selected"<% } %> value="<%= d %>"><%= detect[d] %></option>
+    					<% }); %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                <div class="col-lg-12">
+                                    <div style="display:none" class="form-group" id="uploadFormCont"><br/>
+                                        <form role="form" id="uploadForm" name="uploadForm" enctype="multipart/form-data" action="/upload/feed" method="post">
+                                            <small>Feed Format (CSV): AccountID, AccountName, CampaignName, AdGroupName, UserName, Code, DestinationURL</small>
+                                            <input type="file" id="file" class="file" multiple data-show-upload="false" data-show-caption="true" name="feed" placeholder="Select a feed to upload" />
+                                            <div id="upstatus"></div>
+                                            <input id="btnUpload" type="submit" class="btn btn-lg btn-block btn-primary" value="Upload Feed" name="submit" /><br/>
+                                        </form>
+                                    </div>
+                                    <div class="form-group" id="recipientForm">
+                                        <form role="form" method="post" id="bot" name="bot">
+                                            <div class="form-group" id="email-error"></div>
+                                            <div class="form-group" id="msg">
+                                                <input class="form-control" id="email" required placeholder="E-mail recipient" data-error="Please enter your email" name="email" type="email" autofocus>
+                                            </div>
+                                            <a class="btn btn-lg btn-primary btn-block" id="btnRun">Run Bot</a>
+                                            <div class="form-group">
+                                                <pre style="display:none" id="botstatus"></pre>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                                 </div>
                           </div>
 		     </div>
