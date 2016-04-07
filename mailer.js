@@ -27,9 +27,13 @@ var log     = require("./includes/log.js");
 // mail config
 imports('includes/mail_cfg.js');
 
+// util
+var util = require('util');
+
 // check if recipient arg was passed
 var rcpt = process.argv[2] || mail.to;
 var logfile = process.argv[3] || log.getLogFile();
+var subject = process.argv[4] || log.getDate();
 
 // report 
 var report_path = 'logs/' + logfile;
@@ -42,9 +46,9 @@ var transporter = nodemailer.createTransport('smtp://smtp-01.advdc.com');
 var mailOptions = {
     from: mail.from, 
     to: rcpt, 
-    subject: mail.subject, 
-    text: mail.body,
-    html: mail.body,
+    subject: util.format("%s %s %s", mail.subject, log.getDate(), subject), 
+    text: util.format("%s %s %s", mail.body, log.getDate(), subject),
+    html: util.format("%s %s %s", mail.body, log.getDate(), subject),
     attachments: [
         {   // utf-8 string as an attachment 
             filename: report,

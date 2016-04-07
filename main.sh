@@ -102,7 +102,7 @@ do
        		mail_args+=" $rcpt"
     	fi
     	echo "Sending mail ... "
-    	mail="node mailer.js $mail_args $report"; 
+    	mail="node mailer.js $mail_args $report $ua"; 
     	echo $mail; $mail
     	echo "Done mailing.";
 done
