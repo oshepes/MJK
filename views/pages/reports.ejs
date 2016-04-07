@@ -7,9 +7,13 @@
                             <small>Reports</small>
                         </h1>
 				<ul>
-					<% files.forEach(function(file) { %>
-        					<li><a href="<%= cdn_host %><%= file %>"> <%= file.replace('logs/',''); %></a></li>
-    					<% }); %>
+                                    <% if(files.length === 0) { %>
+                                    <h5>No Reports Found<h5>
+                                    <% } else { %>
+                                    <% files.forEach(function(file) { %>
+        				<li><a href="<%= cdn_host %><%= file %>"> <%= file.replace('logs/',''); %></a></li>
+                                    <% }); %>
+                                    <% } %>
 				</ul>
 			</div>
 		</div>

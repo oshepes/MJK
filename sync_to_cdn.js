@@ -62,8 +62,6 @@ function sync(file, client) {
     });
 
     dest.on('success', function(file) {
-        // success
-        console.log("Success: " + file.name);
         fs.unlinkSync(file.name);
     }, file);
 

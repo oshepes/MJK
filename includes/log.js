@@ -3,7 +3,7 @@ module.exports.getLogFile = function() {
       	var month   = now.getMonth() + 1;
       	var day     = now.getDate();
       	var year    = now.getFullYear();
-      	var logfile = 'logs/' + month + '-' + day + '-' + year  + '.csv';
+      	var logfile = month + '-' + day + '-' + year;
       	return logfile;
 };
 

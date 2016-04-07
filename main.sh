@@ -1,11 +1,12 @@
 #!/bin/bash
-# ------------------------------------------
+# --------------------------------------------------------------------------------
 # main.sh
 # wrapper shell script to execute 
 # Advertiser Compliance Check
 # @author: Oren Shepes <oren@advertise.com>
 # @since: 3/1/16
-# ------------------------------------------
+# @link: http://dashboard.advertise.com/display/PROD/Advertiser+Compliance+Toolkit
+# --------------------------------------------------------------------------------
 
 # get command line options
 # --f={feed} feed file name
@@ -16,6 +17,9 @@
 # --t={limit} number of records to fetch
 # --h print available user-agent options
 # --u={UA_KEY} use specified user-agent (ex: --ua=Chrome41/Win7)
+
+# app root
+app_root="/var/www/html/advcp"
 
 usage() {
 	echo ""
@@ -42,9 +46,9 @@ while getopts ":f:d:l:u:r:s:m:o:t:h" opt; do
     ;;
     d) 	delim="$OPTARG"; args+=" --delim=$delim"
     ;;
-    l) 	log="$OPTARG"; args+=" --log=$log"
+    l) 	log="$OPTARG"; args+=" --logfile=$log"
     ;;
-    u) 	ua="$OPTARG"; args+=" --ua=$ua"
+    u) 	ua="$OPTARG"; # args+=" --ua=$ua"
     ;;
     r) 	rcpt="$OPTARG"; 
     ;;
@@ -67,7 +71,7 @@ while getopts ":f:d:l:u:r:s:m:o:t:h" opt; do
 done
 
 # cd to location
-cd /var/www/html/advcp/
+cd $app_root
 
 # if data source is API
 if [ $src == "db" ]; then
@@ -75,21 +79,33 @@ if [ $src == "db" ]; then
 	node request.js $offset $limit;
 fi
 
-# run spider first
-echo "Running Spider (casperjs) ... ";
-cmd="casperjs --ignore-ssl-errors=true $args crawler.js"
-echo $cmd; $cmd
-echo "Done crawling.";
+# run bot once per ua
+IFS=',' read -r -a array <<< "$ua"
+for ua in "${array[@]}"
+do 
+    	echo "Running bot ($ua) ... ";
+    	cmd="casperjs --ignore-ssl-errors=true $args --ua=$ua crawler.js"
+    	echo $cmd; $cmd
+    	echo "Done crawling."
 
-# mail report
-args=""
-if [ -n "$rcpt" ]; then
-   args+=" $rcpt"
-fi
-echo "Sending mail ... "
-mail="node mailer.js $args"; 
-echo $mail; $mail
-echo "Done mailing.";
+	# prepare report per ua
+	u=`echo $ua | sed -e 's/\//_/g'`
+	report=$(printf "%s_%s.csv" $log $u)
+        cp_cmd="cp logs/$log logs/$report"
+	echo $cp_cmd; $cp_cmd
+	oldlog=$(printf "logs/%s" $log)
+	rm $oldlog
+    
+    	# mail report
+    	mail_args=""
+    	if [ -n "$rcpt" ]; then
+       		mail_args+=" $rcpt"
+    	fi
+    	echo "Sending mail ... "
+    	mail="node mailer.js $mail_args $report"; 
+    	echo $mail; $mail
+    	echo "Done mailing.";
+done
 
 # sync to cdn reports/screenshots
 echo "Synchronizing to CDN ... ";

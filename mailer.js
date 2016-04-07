@@ -29,10 +29,11 @@ imports('includes/mail_cfg.js');
 
 // check if recipient arg was passed
 var rcpt = process.argv[2] || mail.to;
+var logfile = process.argv[3] || log.getLogFile();
 
 // report 
-var report      = 'adv_report_' + log.getDate() + '.csv';
-var report_path = log.getLogFile();
+var report_path = 'logs/' + logfile;
+var report      = 'advcp_' + logfile;
 
 // create transporter object using the default SMTP transport 
 var transporter = nodemailer.createTransport('smtp://smtp-01.advdc.com');

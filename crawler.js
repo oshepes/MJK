@@ -2,6 +2,7 @@
  * Advertiser compliance spider
  * @author Oren Shepes <oren@advertise.com>
  * @since 2/17/16
+ * @link http://dashboard.advertise.com/display/PROD/Advertiser+Compliance+Toolkit
  * 
  * File: crawler.js
  * Run: casperjs --ignore-ssl-errors=true [options] crawler.js
@@ -70,7 +71,7 @@ casper.userAgents = userAgents;
 // set script options
 var logfile = getLogfile();
 feed        = casper.cli.options.feed ? 'data/' + casper.cli.options.feed : feed;
-logfile     = casper.cli.options.logfile ? 'logs/' + casper.cli.options.logfile : logfile;
+logfile     = casper.cli.options.logfile ? 'logs/' + casper.cli.options.logfile : 'logs/' + logfile;
 delim       = casper.cli.options.delim || delim;
 log_delim   = casper.cli.options.log_delim || log_delim;
 ua          = casper.cli.options.ua ? casper.cli.options.ua : 'Chrome41/Win7'; 
@@ -103,7 +104,8 @@ if(casper.cli.options.hasOwnProperty("ua_help")) {
 }
 
 casper.echo("-----------Casper Conf-----------");
-casper.echo("Using feed: " + feed);
+if(src === 'file') casper.echo("Using feed: " + feed);
+else casper.echo("Using: DB");
 casper.echo("Delimiter: " + delim);
 casper.echo("Logfile: " + logfile);
 casper.echo("---------------------------------");
@@ -188,7 +190,7 @@ function crawl(ua_key, urls) {
                 errors.join('|'), log_delim, errors.join('|'), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
             }
             
-            
+            /* capture screen */
             this.capture(loc_img, {
                 top: screen._top,
                 left: screen._left,

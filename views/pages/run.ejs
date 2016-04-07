@@ -1,5 +1,6 @@
 <% include ../partials/header %>
-<link href="/css/fileinput.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/css/fileinput.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/css/bootstrap-multiselect.css" type="text/css"/>
 <!-- content area -->
 		<div class="row">
 		    <div id="list" class="col-lg-9">
@@ -16,10 +17,10 @@
                                         </select>
                                     </div>
                                     <div class="col-md-6">
-                                        <label style="font-weight: 400" for="src">User Agent (Browser)</label>
-                                        <select class="form-control" name="ua" id="ua">
+                                        <label style="font-weight: 400" for="src">User Agent (Browser)</label><br/>
+                                        <select class="form-control" name="ua" id="ua" multiple="multiple">
                                         <% Object.keys(uas).forEach(function(u) { %>
-                                            <option value="<%= u %>"><%= u %></option>
+                                            <option <% if(u.indexOf('Mobile') !== -1) { %>selected="selected"<% } %> value="<%= u %>"><%= u %></option>
     					<% }); %>
                                         </select>
                                     </div>

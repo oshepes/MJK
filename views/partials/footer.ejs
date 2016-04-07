@@ -15,6 +15,9 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="/js/bootstrap.min.js"></script>
 
+    <!-- multiselect -->
+    <script type="text/javascript" src="/js/bootstrap-multiselect.js"></script>
+
     <!-- Metis Menu Plugin JavaScript  -->
     <script src="/js/metisMenu.min.js"></script>
    
@@ -129,6 +132,14 @@
                 $('#botstatus').html('');
                 return;
             }
+        });
+        
+        if($('#ua')) $('#ua').multiselect({
+            checkboxName: 'ua[]',
+            buttonWidth: '100%',
+            dropRight: true,
+            includeSelectAllOption: true,
+            select: 'Android/Mobile'
         });
     });
     </script>

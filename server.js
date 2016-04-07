@@ -28,8 +28,9 @@ var express = require('express'),
         database : mysql_cfg.MYSQL_DB
     });
 
+var log  = require("./includes/log.js");
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var io   = require('socket.io')(http);
     
 /* config */
 app.use(express.static(path.join(__dirname, '/')));
@@ -201,10 +202,10 @@ io.on('connection', function(socket){
         var ua      = params.ua || 'Chrome41/Win7';
         var offset  = params.offset || 0;
         var limit   = params.limit || 1000;
-        
-        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', 'feed.csv', '-u', ua, '-r', params.email]);
+       
+        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', 'feed.csv', '-u', ua, '-r', params.email, '-l', log.getLogFile()]);
 	console.log('running bot...');
-        console.log('params: %s=%s, %s=%s, %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source, 'offset', offset, 'limit', limit);
+        console.log('params: %s=%s, %s=%s, %s=%s, %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source, 'offset', offset, 'limit', limit, 'logfile', log.getLogFile());
 	        
 	var chunk = '';
 	spw.stdout.on('data', function(data){
