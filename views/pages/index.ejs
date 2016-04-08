@@ -3,11 +3,9 @@
 <!-- content area -->
 	<div class="row">
                <div id="list" class="col-lg-12">
-		<h1 class="text-primary page-header">
-			<small>ADVCP Compliance Toolkit - Overview</small>
-                </h1>
-		<p>This utility will crawl advertiser's destination URLs and report back about any violations it had discovered along with screenshots of the offending page.</p>
-		<p>Supported detection:</p>
+                <h4 class="page-header">ADVCP Overview</h4>
+		<p>The ADVCP Bot will crawl advertiser's destination URLs and report back about any violations it had discovered along with screenshots of the offending page.</p>
+		<p><strong>Supported detection:</strong></p>
 		<ul>
 			<li>JS POPUPS (Alerts)</li>
 			<li>Overlays</li>
@@ -16,15 +14,14 @@
                         <li>X-Frame-Options</li>
 			<li>Facebook Instant Articles</li>
 		</ul>
-		<br/>
-                <p>Instructions:</p>
+                <p class="page-header"><strong>Instructions:</strong></p>
                 <ul>
                     <li>To run the BOT: go to &quot;Run ADVCP Bot&quot; select bot options from dropdowns and click on &quot;Run Bot&quot; - an email with the results will be sent to the recipient.</li>
                     <li>You can choose to upload a (.csv) feed via the UI or choose `database` as the source for the Bot. (under Data Source)</li>
                     <li> Reports archive is under the `Reports` tab</li>
                 </ul>
                 
-                <p class="page-header">Tech:</p>
+                <p class="page-header"><strong>Tech:</strong></p>
                 <ul>
                     <li>Config files:</li>
                     <code>includes/config.js</code> - Application <br/>
@@ -47,6 +44,7 @@
                     Crontab: <code>./main.sh -m , -o 0 -t 1000 -s file -f feed.csv -u Chrome43/Win8 -r admin@advertise.com -l 4-4-16 -v CODE_JSPOP</code> <br/>
                     CasperJs: <code>casperjs --ignore-ssl-errors=true --log_delim=, --src=file --feed=feed.csv --logfile=4-8-2016 --detect=CODE_JSPOP,CODE_XFRAME --ua=Android/Mobile crawler.js</code> <br/>
                 </ul>
+                <br/><br/>
 	      </div>
 	</div>
 <% include ../partials/footer %>
