@@ -40,7 +40,7 @@ usage() {
 
 args=""
 
-while getopts ":f:d:l:u:r:s:m:o:t:h" opt; do
+while getopts ":f:d:l:u:r:s:m:o:t:v:h" opt; do
   case $opt in
     f) 	feed="$OPTARG"; args+=" --feed=$feed"
     ;;
@@ -59,6 +59,8 @@ while getopts ":f:d:l:u:r:s:m:o:t:h" opt; do
     o)  offset="$OPTARG"; 
     ;;
     t)  limit="$OPTARG";
+    ;;
+    v)  detect="$OPTARG"; args+=" --detect=$detect"
     ;;
     h) 	help="$OPTARG"; args+=" --ua_help"
        	usage

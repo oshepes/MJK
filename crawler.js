@@ -150,7 +150,7 @@ function crawl(ua_key, urls) {
             this.echo(util.format('%d) %s: %s [%s]', i++, ua_key, url, res.status));    
             this.currentResponse.headers.forEach(function(header){
                 if(header.name === 'X-Frame-Options' && (header.value === 'SAMEORIGIN' || header.value === 'DENY')) {
-                    errors.push(util.format('%s: %s', header.name, header.value));
+                    if(check("CODE_XFRAME", detect)) errors.push(util.format('%s: %s', header.name, header.value));
                 }
             });
   
@@ -174,17 +174,17 @@ function crawl(ua_key, urls) {
             
             /* found 3 conditions to flag as IA */
             if(articleMetas.length === 3) {
-                errors.push('Facebook Instant Article');
+                if(check("CODE_FBIA", detect)) errors.push('Facebook Instant Article');
             }
             
             /* 404 */
             if(res.status == 404) {
-                errors.push('404 Error');
+                if(check("CODE_404", detect)) errors.push('404 Error');
             }
             
             /* 500 */
             if(res.status >= 500) {
-                errors.push('500 Error');
+                if(check("CODE_500", detect)) errors.push('500 Error');
             }
             
             if(errors.length > 0) {
@@ -213,17 +213,21 @@ function crawl(ua_key, urls) {
 
 // onAlert handler
 function handleAlert(casper, msg) {
-    if(casper.campaign.url == casper.getCurrentUrl()) {
-        fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim,
-            'JS Alert (Pop)', log_delim, msg.replace(/\*/g,'').replace(/\r\n|\n|\r/gm,' ').replace(',',''), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
+    if(check("CODE_JSPOP", detect)) {
+        if(casper.campaign.url == casper.getCurrentUrl()) {
+            fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim,
+                'JS Alert (Pop)', log_delim, msg.replace(/\*/g,'').replace(/\r\n|\n|\r/gm,' ').replace(',',''), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
+        }
     }
 }
 
 // onLoadError handler
 function handleLoadError(casper, msg) {
-    if(casper.campaign.url == casper.getCurrentUrl()) {
-        fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim, 
-            'Resource Load Error', log_delim, 'Unavailable', log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a');
+    if(check("CODE_500", detect)) {
+        if(casper.campaign.url == casper.getCurrentUrl()) {
+            fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim, 
+                'Resource Load Error', log_delim, 'Unavailable', log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a');
+        }
     }
 }
 
@@ -257,4 +261,9 @@ function getLogfile() {
     var year    = now.getFullYear();
     var logfile = util.format('logs/%s-%s-%s.csv', month, day, year);
     return logfile;
+}
+
+// inArray
+function check(value, array) {
+    return array.indexOf(value) > -1;
 }
