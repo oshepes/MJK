@@ -96,7 +96,7 @@
 		<profile>
 			<id>qa1</id>
 			<properties>
-				<advdb.hostname>10.100.2.58</advdb.hostname>
+				<advdb.hostname>10.100.2.52</advdb.hostname>
                                 <advdb.username>advcp</advdb.username>
                                 <advdb.password>lastchance</advdb.password>
                                 <advdb.database>advertisedb</advdb.database>
