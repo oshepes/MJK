@@ -15,5 +15,5 @@ var mysql_cfg = {
                     "AND C.status_id = 7 " +
                     "AND A.status = 7 " +
                     "AND AG.status_id = 7 " +
-                    "AND AD.status_id = 7 LIMIT %d, %d"
+                    "AND AD.status_id = 7 LIMIT %d, %d",
 };
