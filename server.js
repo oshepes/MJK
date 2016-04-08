@@ -208,6 +208,8 @@ io.on('connection', function(socket){
 	console.log('running bot...');
         console.log('params: %s=%s, %s=%s, %s=%s, %s=%s, %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source, 'offset', offset, 'limit', limit, 'logfile', log.getLogFile(), 'detect', params.detect);
 	        
+        io.emit('start', spw.pid);
+        
 	var chunk = '';
 	spw.stdout.on('data', function(data){
             chunk += data.toString().replace('<<', '&lt;&lt;').replace('>>', '&gt;&gt;');
@@ -217,7 +219,7 @@ io.on('connection', function(socket){
 	});
 	
 	spw.stderr.on('data', function (data) {
-            //console.log('Failed to start child process.');
+            
 	});
         
         spw.on('exit', function(code) {
@@ -227,6 +229,17 @@ io.on('connection', function(socket){
         spw.on('error', function(e){
             io.emit('error', 1);
         });
+    });
+    
+    socket.on('kill', function(params) {
+        console.log('Got pid to kill: %d', params.pid);
+        var spawn = cp.spawn("kill", ['-9', params.pid]);
+        spawn.stdout.on('data', function(d) {
+            io.emit('killed', d.toString());
+        });
+        spawn.stderr.on('data', function(data) {
+            console.log('Error killing process %d: %s', params.pid, data.toString());
+        })
     });
 });
 
