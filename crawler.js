@@ -23,11 +23,12 @@
  * - Checks for Overlays 
  * - Checks for download dialogs triggers 
  * - Checks for 404/500 errors
+ * - Facebook IAs
+ * - reCAPTCHA
  * 
  * Feed: default data/feed.csv otherwise read from --feed=FEED option on CLI, 
  * feed has to be present under `data` directory
  * 
- * TODO: connect to data sources via an API (pull/push)
  */
 
 
@@ -189,6 +190,28 @@ function crawl(ua_key, urls) {
             if(articleMetas.length === 3) {
                 if(check("CODE_FBIA", detect)) {
                     errors.push('Facebook Instant Article');
+                }
+            }
+            
+            /* reCAPTCHA */
+            reCAPTCHA = this.evaluate(function() {
+                var captchas = [];
+                [].forEach.call(document.querySelectorAll('iframe'), function(elem) {
+                    var captcha = {};
+                    [].slice.call(elem.attributes).forEach(function(attr) {
+                        if( attr.name === 'src' && attr.value.indexOf('google.com/recaptcha') > -1 ) {
+                            captcha[attr.name] = attr.value;
+                            captchas.push(captcha);
+                        }
+                    });
+                });
+                return captchas;
+            });
+            
+            /* reCAPTCHA */
+            if(reCAPTCHA.length > 0) {
+                if(check("CODE_CAPTCHA", detect)) {
+                    errors.push('reCAPTCHA');
                 }
             }
             
