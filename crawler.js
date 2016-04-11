@@ -31,6 +31,8 @@
  */
 
 
+/* ----------------------------------- Main ----------------------------------- */
+
 phantom.injectJs('includes/useragents.js');
 phantom.injectJs('includes/screen.js');
 phantom.injectJs('includes/rackspace.js');
@@ -43,9 +45,11 @@ var ua          = '';
 
 // default feed config
 var formatter   = "%s%s%s%s%s%s%s%s%s%s%s%s%s\n";
+var lm_format   = "{date: \"%s\", url_count: \"%s\", errors: \"%s\", ua: \"%s\"},\n";
 var feed        = 'data/feed.csv';
 var delim       = ",";
 var log_delim   = ",";
+var lm_log      = 'logs/lm_log.txt';
 
 // casper config
 var casper = require("casper").create({
@@ -113,16 +117,23 @@ casper.echo("Logfile: " + logfile);
 casper.echo("---------------------------------");
 casper.echo("Starting ...");
 
+// error counter
+casper.totalErrors = 0;
 var urls = [];
    
+// read/write feed
 getData(feed, delim, src, function(res) {
     urls = res;
 });
 
+// check if we got data
 if(urls.length < 1) console.log('Did not get any URLs to process, existing.');
 
+// crawal
 crawl(ua, urls);
 
+
+/* ----------------------------------- Routines ----------------------------------- */
 
 // crawl
 function crawl(ua_key, urls) {
@@ -150,7 +161,9 @@ function crawl(ua_key, urls) {
             this.echo(util.format('%d) %s: %s [%s]', i++, ua_key, url, res.status));    
             this.currentResponse.headers.forEach(function(header){
                 if(header.name === 'X-Frame-Options' && (header.value === 'SAMEORIGIN' || header.value === 'DENY')) {
-                    if(check("CODE_XFRAME", detect)) errors.push(util.format('%s: %s', header.name, header.value));
+                    if(check("CODE_XFRAME", detect)) { 
+                        errors.push(util.format('%s: %s', header.name, header.value));
+                    }
                 }
             });
   
@@ -174,20 +187,27 @@ function crawl(ua_key, urls) {
             
             /* found 3 conditions to flag as IA */
             if(articleMetas.length === 3) {
-                if(check("CODE_FBIA", detect)) errors.push('Facebook Instant Article');
+                if(check("CODE_FBIA", detect)) {
+                    errors.push('Facebook Instant Article');
+                }
             }
             
             /* 404 */
             if(res.status == 404) {
-                if(check("CODE_404", detect)) errors.push('404 Error');
+                if(check("CODE_404", detect)) {
+                    errors.push('404 Error');
+                }
             }
             
             /* 500 */
             if(res.status >= 500) {
-                if(check("CODE_500", detect)) errors.push('500 Error');
+                if(check("CODE_500", detect)) {
+                    errors.push('500 Error');
+                }
             }
             
             if(errors.length > 0) {
+                (function() {casper.totalErrors += errors.length}());
                 fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim, 
                 errors.join('|'), log_delim, errors.join('|'), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
             }
@@ -203,11 +223,13 @@ function crawl(ua_key, urls) {
         }, logfile, screen, casper.campaign.url, aid, cid, cname, ua_key, log_delim)
         
     }, ua_key, casper, userAgents)
-           
+    
     // run casper
     casper.run(function() {
+        fs.write(lm_log, util.format(lm_format, new Date(), urls.length, casper.totalErrors, ua_key), 'a');
         this.echo("Done").exit();
     });
+    
 } // crawl
 
 
@@ -215,6 +237,7 @@ function crawl(ua_key, urls) {
 function handleAlert(casper, msg) {
     if(check("CODE_JSPOP", detect)) {
         if(casper.campaign.url == casper.getCurrentUrl()) {
+            casper.totalErrors += 1;
             fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim,
                 'JS Alert (Pop)', log_delim, msg.replace(/\*/g,'').replace(/\r\n|\n|\r/gm,' ').replace(',',''), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
         }
@@ -225,6 +248,7 @@ function handleAlert(casper, msg) {
 function handleLoadError(casper, msg) {
     if(check("CODE_500", detect)) {
         if(casper.campaign.url == casper.getCurrentUrl()) {
+            casper.totalErrors += 1;
             fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim, 
                 'Resource Load Error', log_delim, 'Unavailable', log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a');
         }
