@@ -42,12 +42,12 @@ app.set('view engine', 'ejs');
 
 /* index */
 app.get('/', function(req, res){
-    res.render('pages/index', {"socket_io": config.ADV_SOCKET});
+    res.render('pages/index', {"socket_io": config.ADV_SOCKET, "host": config.ADV_HOST});
 });
 
 /* run bot page */
 app.get('/run', function(req, res){
-    res.render('pages/run', {uas: userAgents, detect: detect, socket_io: config.ADV_SOCKET});
+    res.render('pages/run', {uas: userAgents, detect: detect, socket_io: config.ADV_SOCKET, host: config.ADV_HOST});
 });
 
 /* run bot */
@@ -102,7 +102,8 @@ app.get('/reports', function(req, res){
                 res.render('pages/reports', {
                     "files": list,
                     "cdn_host": rackspace.CDN_IMG_HOST,
-                    "socket_io": config.ADV_SOCKET
+                    "socket_io": config.ADV_SOCKET,
+                    "host": config.ADV_HOST
                 });
             })();
         });
@@ -160,6 +161,43 @@ app.get('/campaigns/:offset/:limit', function (req, res) {
             });
         } else {
             var sql = util.format(mysql_cfg.CMP_QUERY, offset, limit);
+            console.log('Query: %s', sql);
+            connection.query(sql, function (err, rows, fields) {
+                if (err) {
+                    console.error('DB Error: %s', err);
+                    res.statusCode = 500;
+                    res.send({
+                        result: 'error',
+                        err: err.code
+                    });
+                }
+                res.send({
+                    result: 'success',
+                    err: '',
+                    fields: fields,
+                    json: rows,
+                    length: rows.length
+                });
+                console.log('recieved %d rows from db', rows.length);
+                connection.release();
+            });
+        }
+    });
+});
+
+/* get campaigns total */
+app.get('/campaigns/total', function (req, res) {
+    
+    connectionpool.getConnection(function (err, connection) {
+        if (err) {
+            console.error('CONNECTION error: ', err);
+            res.statusCode = 503;
+            res.send({
+                result: 'error',
+                err: err.code
+            });
+        } else {
+            var sql = util.format(mysql_cfg.CMP_TOTAL);
             console.log('Query: %s', sql);
             connection.query(sql, function (err, rows, fields) {
                 if (err) {

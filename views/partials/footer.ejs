@@ -32,6 +32,16 @@
 
     <script>
     $(document).ready(function() {
+        
+        if($('#src').val()) {
+            $.ajax({
+                url: "<%= host %>/campaigns/total", 
+                success: function(result){
+                    $('#src option[value="db"]').text("Database (" + result.json[0].total + ")");
+                }
+            });
+        }
+
         $('#src').change(function() {
             if($('#src').val() == 'file') {
                 $('#chkContainer').show();
