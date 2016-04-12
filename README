@@ -35,6 +35,8 @@ Platform: CentOs 7 64bit / nodejs / phantomjs / casperjs
 1.12) sudo npm install body-parser
 1.13) sudo npm install ejs
 1.14) sudo npm install multer
+1.15) npm install cookie-parser
+1.16) npm install express-session
 
 2) Install Phantomjs:
 2.1) npm install -g phantomjs

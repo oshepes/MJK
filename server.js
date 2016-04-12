@@ -22,6 +22,8 @@ var express = require('express'),
     multer  = require('multer'),
     util    = require('util'),
     pkgcloud    = require('pkgcloud'),
+    cookieParser = require('cookie-parser'),
+    session      = require('express-session');
     connectionpool = mysql.createPool({
         host     : mysql_cfg.MYSQL_HOST,
         user     : mysql_cfg.MYSQL_USER,
@@ -35,6 +37,8 @@ var io   = require('socket.io')(http);
     
 /* config */
 app.use(express.static(path.join(__dirname, '/')));
+app.use(cookieParser());
+app.use(session({secret: 'Ad73p$t00lk1t', cookie: {}, resave: true, saveUninitialized: true}));
 app.use(parser.urlencoded({ extended: false }));
 app.use(parser.json());
 app.set('view engine', 'ejs');
@@ -187,39 +191,49 @@ app.get('/campaigns/:offset/:limit', function (req, res) {
 
 /* get campaigns total */
 app.get('/campaigns/total', function (req, res) {
-    
-    connectionpool.getConnection(function (err, connection) {
-        if (err) {
-            console.error('CONNECTION error: ', err);
-            res.statusCode = 503;
-            res.send({
-                result: 'error',
-                err: err.code
-            });
-        } else {
-            var sql = util.format(mysql_cfg.CMP_TOTAL);
-            console.log('Query: %s', sql);
-            connection.query(sql, function (err, rows, fields) {
-                if (err) {
-                    console.error('DB Error: %s', err);
-                    res.statusCode = 500;
-                    res.send({
-                        result: 'error',
-                        err: err.code
-                    });
-                }
+    var sess = req.session;
+    if(!sess.t_campaigns) {
+        connectionpool.getConnection(function (err, connection) {
+            if (err) {
+                console.error('CONNECTION error: ', err);
+                res.statusCode = 503;
                 res.send({
-                    result: 'success',
-                    err: '',
-                    fields: fields,
-                    json: rows,
-                    length: rows.length
+                    result: 'error',
+                    err: err.code
                 });
-                console.log('recieved %d rows from db', rows.length);
-                connection.release();
-            });
-        }
-    });
+            } else {
+                var sql = util.format(mysql_cfg.CMP_TOTAL);
+                connection.query(sql, function (err, rows, fields) {
+                    if (err) {
+                        console.error('DB Error: %s', err);
+                        res.statusCode = 500;
+                        res.send({
+                            result: 'error',
+                            err: err.code
+                        });
+                    }
+                    sess.t_campaigns = rows[0].total;
+                    res.send({
+                        result: 'success',
+                        err: '',
+                        fields: fields,
+                        json: rows,
+                        length: rows.length,
+                        t_campaigns: rows[0].total
+                    });
+                    console.log('recieved count of %s records from db', rows[0].total);
+                    connection.release();
+                });
+            }
+        });
+    } else {
+        console.log('session t_campaigns: %s', sess.t_campaigns);
+        res.send({
+            result: 'success',
+            err: '',
+            json: [{total: sess.t_campaigns}]
+        })
+    }
 });
 
 /* socket to bot process */

@@ -38,6 +38,9 @@
                 url: "<%= host %>/campaigns/total", 
                 success: function(result){
                     $('#src option[value="db"]').text("Database (" + result.json[0].total + ")");
+                },
+                error: function(err) {
+                    $('#src option[value="db"]').text("Database (Error)");
                 }
             });
         }
@@ -158,19 +161,19 @@
             }
         });
         
-        if($('#ua')) $('#ua').multiselect({
-            checkboxName: 'ua[]',
-            buttonWidth: '100%',
-            dropRight: true,
-            includeSelectAllOption: true,
-            select: 'Android/Mobile'
-        });
         if($('#detect')) $('#detect').multiselect({
             checkboxName: 'detect[]',
             buttonWidth: '100%',
             dropRight: true,
+            numberDisplayed: 5,
+            select: 'CODE_JSPOPS',
+        });
+        if($('#ua')) $('#ua').multiselect({
+            checkboxName: 'ua[]',
+            buttonWidth: '100%',
+            dropRight: true,
             numberDisplayed: 4,
-            select: 'CODE_JSPOPS'
+            select: 'Android/Mobile',
         });
     });
     </script>
