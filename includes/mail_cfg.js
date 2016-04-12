@@ -1,6 +1,6 @@
 var mail = {
-    "from": 'Oren Shepes <oren@advertise.com>',
-    "to": 'Oren Shepes <oren@advertise.com>',
+    "from": 'ADV Compliance <advcp@advertise.com>',
+    "to": 'ADV Compliance <advcp@advertise.com>',
     "body": 'Advertiser Compliance Report',
     "subject": 'ADVCP '
 }
