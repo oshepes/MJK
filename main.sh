@@ -56,7 +56,7 @@ while getopts ":f:d:l:u:r:s:m:o:j:t:v:h" opt; do
     ;;
     s) 	src="$OPTARG"; args+=" --src=$src"
     ;;
-    j)  jobid="$OPTARG";
+    j)  jobid="$OPTARG"; args+=" --job_id=$jobid"
     ;;
     o)  offset="$OPTARG"; 
     ;;
@@ -108,6 +108,7 @@ cmd_sort=`cat logs/$report | grep -v "Account ID" | sort | uniq > logs/$tmp_rpt`
 $cmd_sort
 header=$(printf "%s%s%s%s%s%s%s%s%s%s%s%s%s" "AccountID" $log_delim "CampaignID" $log_delim "CampaignName" $log_delim "ErrorType" $log_delim "Message" $log_delim "URL" $log_delim "Screenshot")
 echo $header > logs/$report && cat logs/$tmp_rpt >> logs/$report
+rm logs/$tmp_rpt;
 
 # mail report
 if [ -n "$rcpt" ]; then
@@ -126,5 +127,6 @@ echo "Synchronizing to CDN ... ";
 for x in `ls screenshots/`; do node sync_to_cdn.js screenshots/$x; done;
 for r in `ls logs/`; do node sync_to_cdn.js logs/$r; done;
 echo "Done synchronizing.";
-
-echo ""
+echo "Cleaning up..."
+# for f in `ls logs/*.csv`; do rm logs/$f; done;
+echo "Bot process completed!"

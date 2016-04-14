@@ -115,15 +115,12 @@ io.on('connection', function(socket){
             var logfile     = util.format('logs/%s_%s.csv', log.getLogFile(), job_id);
             request(endpoint, function (error, response, body) {
               if (!error && response.statusCode == 200) {
-                  try {
-                      fs.unlinkSync(logfile);
-                  } catch(e) {
-                      console.log('Error removing log file: %s', e.stack);
-                  }
+                    // finish process
               } else {
                     console.log(error);
               }
             });
+            
             io.emit('close', 1);
         });
         

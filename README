@@ -46,6 +46,9 @@ Platform: CentOs 7 64bit / nodejs / phantomjs / casperjs
 3) Install Casperjs:
 3.1) npm install -g casperjs
 
+4) Install MongoDB: sudo yum install -y mongodb-org
+4.1) https://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat/
+
 CONFIG:
 -------
 - User-agent config file is located at `includes/useragents.js`

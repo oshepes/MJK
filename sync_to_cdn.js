@@ -62,7 +62,7 @@ function sync(file, client) {
     });
 
     dest.on('success', function(file) {
-        if(file.name.indexOf('lm_log') == -1) {
+        if(file.name.indexOf('logs') == -1) {
             fs.unlinkSync(file.name);
         }
     }, file);

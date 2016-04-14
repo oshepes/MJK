@@ -21,16 +21,8 @@
                     <li> Reports archive is under the `Reports` tab</li>
                 </ul>
                
-                <p class="page-header"><strong>Tech:</strong></p>
-                <p>Config files:</p>
-                <ul>
-                    <code>includes/config.js</code> - Application <br/>
-                    <code>includes/useragents.js</code> - User-Agents <br/>
-                    <code>includes/rackspace.js</code> - Rackspace CDN <br/>
-                    <code>includes/mysql.js</code> - Database <br/>
-                    <code>includes/detect.js</code> - Violation detection <br/>
-                    <code>includes/mail_cfg.js</code> - Mail <br/>
-                </ul>
+                <p class="page-header"><a id="techBtn" class="btn btn-default">Technical</a></p>
+                <div id="tech_info" style="display:none" class="col-lg-10">
                 <p>Application:</p>
                 <ul>
                     <code>assembly/</code> - maven config<br/>
@@ -50,13 +42,23 @@
                     <code>server.js</code> - NodeJs server (API)<br/>
                     <code>request.js</code> - Feed writer (from API)<br/>
                 </ul>
+                <p>Config files:</p>
+                <ul>
+                    <code>includes/config.js</code> - Application <br/>
+                    <code>includes/useragents.js</code> - User-Agents <br/>
+                    <code>includes/rackspace.js</code> - Rackspace CDN <br/>
+                    <code>includes/mysql.js</code> - Database <br/>
+                    <code>includes/detect.js</code> - Violation detection <br/>
+                    <code>includes/mail_cfg.js</code> - Mail <br/>
+                </ul>
                 <p>Examples:</p>
                 <ul>
                     Crontab: <code>./main.sh -m , -o 0 -t 1000 -s file -f feed.csv -u Chrome43/Win8 -r admin@advertise.com -l 4-4-16 -v CODE_JSPOP</code> <br/>
                     CasperJs: <code>casperjs --ignore-ssl-errors=true --log_delim=, --src=file --feed=feed.csv --logfile=4-8-2016 --detect=CODE_JSPOP,CODE_XFRAME --ua=Android/Mobile crawler.js</code> <br/>
                     CDN: <code>node sync_to_cdn.js FILE</code> <br/>
                     Mailer: <code>node mailer.js RCPT FILE [UA] </code> <br/>
-                </ul>
+                </ul><br/>
+                </div>
                 <br/><br/>
 	      </div>
 	</div>

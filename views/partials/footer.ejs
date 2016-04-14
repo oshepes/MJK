@@ -56,6 +56,14 @@
             }
         });
 
+        $('#top').click(function() {
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        });
+
+        $('#techBtn').click(function() {
+            $('#tech_info').toggle();
+        });
+
         $('#file').click(function() {
             $('#btnUpload').show();
         });
@@ -138,6 +146,7 @@
 
                 socket.on('newdata', function(d){
                     $('#botstatus').html(d);
+                    $("html, body").animate({ scrollTop: $(document).height() }, "slow");
                 });
 
                 socket.on('killed', function(d){
@@ -149,6 +158,7 @@
                     $('#email-error').removeClass('alert-danger');
                     $('#msg').addClass('alert alert-success');
                     $('#msg').html('&nbsp;&nbsp;<span class="icon-large icon-ok"></span> Bot process completed @ ' + new Date());
+                    $('#top').show();
                 });
                 
             } else {

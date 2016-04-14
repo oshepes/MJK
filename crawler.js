@@ -17,7 +17,7 @@
  * 
  * User-agents are configured in includes/useragents.js
  * 
- * Features:
+ * Features (includes/detect.js):
  * - Capture screenshot of violating lander (JS Alerts)
  * - Checks for JS Alerts (JS Pop)
  * - Checks for Overlays 
@@ -46,7 +46,7 @@ var ua          = '';
 
 // default feed config
 var formatter   = "%s%s%s%s%s%s%s%s%s%s%s%s%s\n";
-var lm_format   = "{date: \"%s\", url_count: \"%s\", errors: \"%s\", ua: \"%s\"},\n";
+var lm_format   = "{date: \"%s\", url_count: \"%s\", errors: \"%s\", ua: \"%s\", jobId: \"%s\"},\n";
 var feed        = 'data/feed.csv';
 var delim       = ",";
 var log_delim   = ",";
@@ -83,6 +83,7 @@ log_delim   = casper.cli.options.log_delim || log_delim;
 ua          = casper.cli.options.ua ? casper.cli.options.ua : 'Chrome41/Win7'; 
 var src     = casper.cli.options.src ? casper.cli.options.src : 'file';
 var detect  = casper.cli.options.detect ? casper.cli.options.detect : Object.keys(detect);
+var job_id  = casper.cli.options.job_id ? casper.cli.options.job_id : '';
 
 // truncate logger
 try {
@@ -249,7 +250,7 @@ function crawl(ua_key, urls) {
     
     // run casper
     casper.run(function() {
-        fs.write(lm_log, util.format(lm_format, new Date(), urls.length, casper.totalErrors, ua_key), 'a');
+        fs.write(lm_log, util.format(lm_format, new Date(), urls.length, casper.totalErrors, ua_key, job_id), 'a');
         this.echo("Done").exit();
     });
     
