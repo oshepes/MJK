@@ -37,6 +37,8 @@ Platform: CentOs 7 64bit / nodejs / phantomjs / casperjs
 1.14) sudo npm install multer
 1.15) npm install cookie-parser
 1.16) npm install express-session
+1.17) npm install mongoose --save
+1.18) npm install shortid
 
 2) Install Phantomjs:
 2.1) npm install -g phantomjs

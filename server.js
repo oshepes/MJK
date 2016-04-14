@@ -5,6 +5,7 @@
  * @since: 3/17/16
  */
 
+/* config files */
 require('node-import');
 imports('includes/mysql.js');
 imports('includes/useragents.js');
@@ -20,6 +21,7 @@ var express = require('express'),
     parser  = require('body-parser'),
     fs      = require('fs'),
     util    = require('util'),
+    shortid = require('shortid'),
     cookieParser = require('cookie-parser'),
     session      = require('express-session');
     connectionpool = mysql.createPool({
@@ -34,7 +36,7 @@ var http    = require('http').Server(app);
 var io      = require('socket.io')(http);
 var routes  = require('./routes');
 
-/* config */
+/* app config */
 app.use(express.static(path.join(__dirname, '/')));
 app.use(cookieParser());
 app.use(session({
@@ -73,6 +75,12 @@ app.get('/campaigns/:offset/:limit', routes.getCampaigns);
 /* get campaigns total */
 app.get('/campaigns/total', routes.campaignsTotal);
 
+/* set a campaign */
+app.get('/setcmp', routes.setCampaign);
+
+/* write job */
+app.get('/finish/:job_id', routes.finish);
+
 /* socket to bot process */
 io.on('connection', function(socket){
     socket.on('run', function(params) {    
@@ -80,8 +88,10 @@ io.on('connection', function(socket){
         var ua      = params.ua || 'Chrome41/Win7';
         var offset  = params.offset || 0;
         var limit   = params.limit || 1000;
-       
-        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', 'feed.csv', '-u', ua, '-r', params.email, '-l', log.getLogFile(), '-v', params.detect]);
+        var job_id  = shortid.generate();
+        var feed    = 'feed.csv';
+        
+        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', feed, '-u', ua, '-r', params.email, '-l', log.getLogFile(), '-v', params.detect, '-j', job_id]);
 	console.log('running bot...');
         console.log('params: %s=%s, %s=%s, %s=%s, %s=%s, %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source, 'offset', offset, 'limit', limit, 'logfile', log.getLogFile(), 'detect', params.detect);
 	        
@@ -100,7 +110,18 @@ io.on('connection', function(socket){
 	});
         
         spw.on('exit', function(code) {
+            var request = require('request');
+            var job_id = shortid.generate();
             io.emit('close', 1);
+            
+            var endpoint = util.format('%s/finish/%s', config.ADV_HOST, job_id);
+            request(endpoint, function (error, response, body) {
+              if (!error && response.statusCode == 200) {
+                  // finish job
+              } else {
+                    console.log(error);
+              }
+            });
         });
         
         spw.on('error', function(e){

@@ -4,4 +4,5 @@ var config = {
      "ADV_SOCKET": "http://localhost:8000", 
      "ADV_DOMAIN": "advcp.com",
      "ADV_SITE": "ADVCP", 
+     "MONGODB_HOST": "mongodb://localhost/advcp"
 };

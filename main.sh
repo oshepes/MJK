@@ -40,7 +40,7 @@ usage() {
 
 args=""
 
-while getopts ":f:d:l:u:r:s:m:o:t:v:h" opt; do
+while getopts ":f:d:l:u:r:s:m:o:j:t:v:h" opt; do
   case $opt in
     f) 	feed="$OPTARG"; args+=" --feed=$feed"
     ;;
@@ -55,6 +55,8 @@ while getopts ":f:d:l:u:r:s:m:o:t:v:h" opt; do
     m) 	log_delim="$OPTARG"; args+=" --log_delim=$log_delim"
     ;;
     s) 	src="$OPTARG"; args+=" --src=$src"
+    ;;
+    j)  jobid="$OPTARG";
     ;;
     o)  offset="$OPTARG"; 
     ;;
@@ -92,7 +94,7 @@ do
 
 	# prepare report per ua
 	u=`echo $ua | sed -e 's/\//_/g'`
-	report=$(printf "%s_%s.csv" $log $u)
+	report=$(printf "%s_%s_%s.csv" $log $u $jobid)
         cp_cmd="cp logs/$log logs/$report"
 	echo $cp_cmd; $cp_cmd
 	oldlog=$(printf "logs/%s" $log)
