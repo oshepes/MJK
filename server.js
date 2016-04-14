@@ -79,7 +79,7 @@ app.get('/campaigns/total', routes.campaignsTotal);
 app.get('/setcmp', routes.setCampaign);
 
 /* write job */
-app.get('/finish/:job_id', routes.finish);
+app.get('/finish/:job_id/:logfile', routes.finish);
 
 /* socket to bot process */
 io.on('connection', function(socket){
@@ -90,7 +90,7 @@ io.on('connection', function(socket){
         var limit   = params.limit || 1000;
         var job_id  = shortid.generate();
         var feed    = 'feed.csv';
-        
+                
         var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', feed, '-u', ua, '-r', params.email, '-l', log.getLogFile(), '-v', params.detect, '-j', job_id]);
 	console.log('running bot...');
         console.log('params: %s=%s, %s=%s, %s=%s, %s=%s, %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source, 'offset', offset, 'limit', limit, 'logfile', log.getLogFile(), 'detect', params.detect);
@@ -110,18 +110,21 @@ io.on('connection', function(socket){
 	});
         
         spw.on('exit', function(code) {
-            var request = require('request');
-            var job_id = shortid.generate();
-            io.emit('close', 1);
-            
-            var endpoint = util.format('%s/finish/%s', config.ADV_HOST, job_id);
+            var request     = require('request');
+            var endpoint    = util.format('%s/finish/%s/%s', config.ADV_HOST, job_id, log.getLogFile());
+            var logfile     = util.format('logs/%s_%s.csv', log.getLogFile(), job_id);
             request(endpoint, function (error, response, body) {
               if (!error && response.statusCode == 200) {
-                  // finish job
+                  try {
+                      fs.unlinkSync(logfile);
+                  } catch(e) {
+                      console.log('Error removing log file: %s', e.stack);
+                  }
               } else {
                     console.log(error);
               }
             });
+            io.emit('close', 1);
         });
         
         spw.on('error', function(e){

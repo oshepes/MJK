@@ -46,9 +46,9 @@ var transporter = nodemailer.createTransport('smtp://smtp-01.advdc.com');
 var mailOptions = {
     from: mail.from, 
     to: rcpt, 
-    subject: util.format("%s %s %s", mail.subject, log.getDate(), subject), 
-    text: util.format("%s %s %s", mail.body, log.getDate(), subject),
-    html: util.format("%s %s %s", mail.body, log.getDate(), subject),
+    subject: util.format("%s %s", mail.subject, log.getDate()), 
+    text: util.format("%s %s", mail.body, log.getDate()),
+    html: util.format("%s %s", mail.body, log.getDate()),
     attachments: [
         {   // utf-8 string as an attachment 
             filename: report,

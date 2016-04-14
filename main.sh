@@ -83,6 +83,9 @@ if [ $src == "db" ]; then
 	node request.js $offset $limit;
 fi
 
+# report file
+report=$(printf "%s_%s.csv" $log $jobid)
+
 # run bot once per ua
 IFS=',' read -r -a array <<< "$ua"
 for ua in "${array[@]}"
@@ -92,24 +95,31 @@ do
     	echo $cmd; $cmd
     	echo "Done crawling."
 
-	# prepare report per ua
-	u=`echo $ua | sed -e 's/\//_/g'`
-	report=$(printf "%s_%s_%s.csv" $log $u $jobid)
-        cp_cmd="cp logs/$log logs/$report"
-	echo $cp_cmd; $cp_cmd
+	# prepare report 
+        cat_cmd=`cat logs/$log >> logs/$report`
+	echo $cat_cmd; $cat_cmd
 	oldlog=$(printf "logs/%s" $log)
-	rm $oldlog
-    
-    	# mail report
-    	mail_args=""
-    	if [ -n "$rcpt" ]; then
-       		mail_args+=" $rcpt"
-    	fi
-    	echo "Sending mail ... "
-    	mail="node mailer.js $mail_args $report $ua"; 
-    	echo $mail; $mail
-    	echo "Done mailing.";
 done
+
+# sort and uniq report
+echo "preparing report..."
+tmp_rpt="tmp_rpt"
+cmd_sort=`cat logs/$report | grep -v "Account ID" | sort | uniq > logs/$tmp_rpt`
+$cmd_sort
+header=$(printf "%s%s%s%s%s%s%s%s%s%s%s%s%s" "AccountID" $log_delim "CampaignID" $log_delim "CampaignName" $log_delim "ErrorType" $log_delim "Message" $log_delim "URL" $log_delim "Screenshot")
+echo $header > logs/$report && cat logs/$tmp_rpt >> logs/$report
+
+# mail report
+if [ -n "$rcpt" ]; then
+	mail_args+=" $rcpt"
+fi
+
+echo ""
+echo "Sending mail ... "
+mail="node mailer.js $mail_args $report";
+echo $mail; $mail
+echo "Done mailing.";
+echo ""
 
 # sync to cdn reports/screenshots
 echo "Synchronizing to CDN ... ";

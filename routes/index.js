@@ -27,7 +27,7 @@ exports.reports = function(req, res){
     list = [];
     client.getFiles(rackspace.CDN_CONT, {prefix: 'logs', limit: 100}, function (err, files) {
         files.forEach(function (file) {
-            list.push(file.name);
+           if(file.name.indexOf('.csv') > -1) list.push(file.name);
         });
         (function () {
             res.render('pages/reports', {
@@ -101,7 +101,7 @@ exports.list = function(req, res) {
             if (err) throw err;
             list = [];
             files.sort.forEach(function (file) {
-                list.push("<li><a href='/logs/" + file + "'>" + file + "</a></li>");
+                if(file.indexOf('.csv') > -1) list.push("<li><a href='/logs/" + file + "'>" + file + "</a></li>");
             });
             res.send(list);
    	});
@@ -223,11 +223,15 @@ exports.setCampaign = function(req, res) {
 
 exports.finish = function(req, res) {
     var job_id  = req.params.job_id || null;
+    var logfile = req.params.logfile || null;
     var fs      = require('fs');
+    var util    = require('util');
     var Job     = require('../models/job');
     var feed    = 'data/feed.csv';
+    var logfeed = util.format("logs/%s_%s.csv", logfile, job_id);
     var now     = new Date();
     console.log('Finishing job: %s', job_id);
+    // feed
     try {
         fs.readFile(feed, 'utf8', function(err, contents) {
             lines = contents.split('\n');
@@ -249,14 +253,53 @@ exports.finish = function(req, res) {
                             console.log(JSON.stringify(err));
                             throw err;
                         }
-                        console.log('saved: %s: %s', job_id, url);
+                        console.log('url saved: %s: %s', job_id, url);
                     });
                 }
             });
         });
-        res.send('done!');
     } catch (e) {
-        console.log(e);
+        console.log(e.stack);
     }
+    
+    // violations
+    console.log('processing violations... %s', logfeed);
+    try {
+        fs.readFile(logfeed, 'utf8', function (err, contents) {
+            if (contents && contents.length > 1) {
+                lines = contents.split('\n');
+                lines.forEach(function (line) {
+                    var parts = line.split(',');
+                    var url = parts[parts.length - 2];
+                    var violations = parts[3];
+                    console.log('url: %s, job: %s, violations:', url, job_id, violations);
+                    if (url && job_id && url !== 'URL') {
+
+                        var newJob = Job({
+                            job_id: job_id,
+                            url: url,
+                            violations: violations,
+                            created_at: now,
+                            completed_at: now
+                        });
+
+                        newJob.save(function (err) {
+                            if (err) {
+                                console.log(JSON.stringify(err));
+                                throw err;
+                            }
+                            console.log('violation saved: %s: %s: %s', job_id, violations, url);
+                        });
+                    }
+                });
+            } else {
+                console.log('skipping: %s, contents: %s', job_id, contents);
+            }
+        });
+    } catch (e) {
+        console.log(e.stack);
+    }
+    
+    res.send('feed processing done!');
 };
 
