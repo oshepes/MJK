@@ -21,11 +21,11 @@
                                     </thead>
                                     <tbody>
                                     <% jobs.forEach(function(job) { %>
-                                    <% if(job.violations.indexOf('Error Type') === -1) { %>
+                                    <% if(job.violations && job.violations.indexOf('Error Type') === -1) { %>
         				<tr>
                                             <td><%= job.job_id %></td>
                                             <td><%= job.violations %></td>
-                                            <td><% if(job.url) { %><%= job.url.split('/').reverse()[0] %><% } else { %>N.A<% } %></td>
+                                            <td><% if(job.url) { %><a target="_blank" href="<%= job.url %>"><%= job.url.split('/').reverse()[0] %></a><% } else { %>N.A<% } %></td>
                                             <td><%= job.completed_at %></td>
                                         </tr>
                                     <% } %>
