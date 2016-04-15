@@ -114,7 +114,7 @@ exports.list = function(req, res) {
 exports.jobs = function (req, res) {
     imports('includes/config.js');
     var Job         = require('../models/job');
-    var limit       = req.params.limit || 100; 
+    var limit       = req.params.limit || 1500; 
         
     Job.find({}).
             select({job_id: 1, url: 1, violations: 1, created_at: 1, completed_at: 1}).
@@ -133,7 +133,7 @@ exports.jobs = function (req, res) {
 /* campaigns endpoint mongodb */
 exports.campaigns = function (req, res) {
     imports('includes/config.js');
-    var limit       = req.params.limit || 100; 
+    var limit       = req.params.limit || 1500; 
     var Campaign    = require('../models/campaign');
     
     Campaign.find({}).
