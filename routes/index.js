@@ -110,6 +110,42 @@ exports.list = function(req, res) {
     }
 };
 
+/* jobs endpoint mongodb */
+exports.jobs = function (req, res) {
+    imports('includes/config.js');
+    var Job         = require('../models/job');
+    var limit       = req.params.limit || 100; 
+        
+    Job.find({}).
+            select({job_id: 1, url: 1, violations: 1, created_at: 1, completed_at: 1}).
+            where('violations').ne('').
+            limit(limit).
+            sort('completed_at').
+            exec(function(err, result){
+                res.render('pages/jobs', {
+                    "host": config.ADV_HOST,
+                    "socket_io": config.ADV_SOCKET,
+                    'jobs': result
+                });
+            });
+};
+  
+/* campaigns endpoint mongodb */
+exports.campaigns = function (req, res) {
+    imports('includes/config.js');
+    var limit       = req.params.limit || 100; 
+    var Campaign    = require('../models/campaign');
+    
+    Campaign.find({}).
+            select({account_id: 1, account_name: 1, screenshot: 1, url: 1, violations: 1, created_at: 1, completed_at: 1}).
+            limit(limit).
+            exec(function(err, result){
+                res.send({
+                    'campaigns': result
+                });
+            });
+};
+
 /* campaigns endpoint */
 exports.getCampaigns = function (req, res) {
     var util = require('util');
@@ -197,10 +233,43 @@ exports.campaignsTotal = function (req, res) {
     }
 };
 
-exports.setCampaign = function(req, res) {
+exports.initdb = function(req, res) {
+    // init db w/ collections
+    var Campaign = require('../models/campaign'),
+            Job = require('../models/job');
     
-    var Cmp = require('../models/campaign');
+    var newCampaign = Campaign({
+        account_id: "100000",
+        account_name: "Accttest",
+        campaign_name: "Campaign Test",
+        adgroup_name: "AdGroup Test",
+        username: "advcp",
+        code: "ADVCP",
+        destination_url: "http://www.advertise.com/",
+        violations: "CODE_JSPOP",
+        created_at: new Date(),
+        updated_at: new Date()
+    });
+    newCampaign.save(function(err) {
+        if (err) throw err;
+        console.log('Campaign created!');
+    });
+    
+    var newJob = new Job({
+        job_id: "10001",
+        url: "http://www.advertise.com/",
+        violations: "",
+        created_at: new Date(),
+        completed_at: new Date()
+    });
+    newJob.save(function(err) {
+       if(err) throw err;
+       console.log('Job created!');
+    });
+};
 
+exports.setCampaign = function(req, res) {
+    var Cmp = require('../models/campaign');
     var newCmp = Cmp({
         account_id: "1009459",
         account_name: "Acct123",
@@ -213,8 +282,7 @@ exports.setCampaign = function(req, res) {
         created_at: new Date(),
         updated_at: new Date()
     });
-
-    // save the user
+    // save 
     newCmp.save(function(err) {
         if (err) throw err;
         console.log('Campaign created!');

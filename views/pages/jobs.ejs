@@ -1,0 +1,37 @@
+<% include ../partials/header %>
+
+<!-- content area -->
+		<div class="row">
+			<div id="list" class="col-lg-12">
+			<h1 class="page-header">
+                            <small>Jobs</small>
+                        </h1>
+				<ul>
+                                    <% if(jobs.length === 0) { %>
+                                    <h5>No Jobs Found<h5>
+                                    <% } else { %>
+                                    <table id="jobs" style="font-weight: 400; font-size: 14px" class="display" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>JobID</th>
+                                            <th>Violations</th>
+                                            <th>Screenshot</th>
+                                            <th>Completed At</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <% jobs.forEach(function(job) { %>
+        				<tr>
+                                            <td><%= job.job_id %></td>
+                                            <td><%= job.violations %></td>
+                                            <td><%= job.url.substring(0,40) %> ... <%= job.url.substring(job.url.length-40, job.url.length) %></td>
+                                            <td><%= job.completed_at %></td>
+                                        </tr>
+                                    <% }); %>
+                                    </tbody>
+                                    </table>
+                                    <% } %>
+				</ul>
+			</div>
+		</div>
+<% include ../partials/footer %>

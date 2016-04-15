@@ -12,6 +12,9 @@
     <!-- uploader -->
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
 
+    <!-- data tables -->
+    <script src="/js/jquery.dataTables.min.js"></script>
+
     <!-- Bootstrap Core JavaScript -->
     <script src="/js/bootstrap.min.js"></script>
 
@@ -185,6 +188,8 @@
             numberDisplayed: 4,
             select: 'Android/Mobile',
         });
+
+        if('#jobs') $('#jobs').DataTable();
     });
     </script>
 </body>

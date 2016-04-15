@@ -69,7 +69,13 @@ app.get('/reports', routes.reports);
 /* report list */
 app.get('/list', routes.list);
 
-/* get campaigns */
+/* get jobs */
+app.get('/jobs', routes.jobs);
+
+/* get campaigns bot */
+app.get('/campaigns', routes.campaigns);
+
+/* get campaigns adv db */
 app.get('/campaigns/:offset/:limit', routes.getCampaigns);
 
 /* get campaigns total */
@@ -104,10 +110,6 @@ io.on('connection', function(socket){
             console.log('%s', chunk);
             io.emit('newdata', chunk);
 	});
-	
-	spw.stderr.on('data', function (data) {
-            
-	});
         
         spw.on('exit', function(code) {
             var request     = require('request');
@@ -119,8 +121,7 @@ io.on('connection', function(socket){
               } else {
                     console.log(error);
               }
-            });
-            
+            }); 
             io.emit('close', 1);
         });
         
