@@ -90,6 +90,7 @@
                                 <adv.socket>http://compliance.advertise.com:8000</adv.socket>
 				<adv.domain>advcp.com</adv.domain>
 				<adv.site_name>ADVCP</adv.site_name>
+                                <adv.mongodb_host>mongodb://localhost/advcp</adv.mongodb_host>
 				<debug_level>1</debug_level>
 			</properties>
 		</profile>
@@ -106,6 +107,7 @@
                                 <adv.socket>http://qa1.compliance.advertise.com:8000</adv.socket>
                                 <adv.domain>advcp.com</adv.domain>
                                 <adv.site_name>ADVCP</adv.site_name>
+                                <adv.mongodb_host>mongodb://localhost/advcp</adv.mongodb_host>
                                 <debug_level>1</debug_level>
 			</properties>
 		</profile>
@@ -122,6 +124,7 @@
                                 <adv.socket>http://localhost:8000</adv.socket>
                                 <adv.domain>advcp.com</adv.domain>
                                 <adv.site_name>ADVCP</adv.site_name>
+                                <adv.mongodb_host>mongodb://localhost/advcp</adv.mongodb_host>
                                 <debug_level>1</debug_level>
 			</properties>
 		</profile>

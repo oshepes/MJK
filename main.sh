@@ -77,6 +77,9 @@ done
 # cd to location
 cd $app_root
 
+# clean old files
+for f in `ls logs/*.csv`; do rm logs/$f; done;
+
 # if data source is API
 if [ $src == "db" ]; then
 	echo "Writing feed...";
