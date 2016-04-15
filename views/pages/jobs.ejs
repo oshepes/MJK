@@ -24,7 +24,7 @@
         				<tr>
                                             <td><%= job.job_id %></td>
                                             <td><%= job.violations %></td>
-                                            <td><%= job.url.substring(0,40) %> ... <%= job.url.substring(job.url.length-40, job.url.length) %></td>
+                                            <td><% if(job.url) { %><%= job.url.substring(0,40) %> ... <%= job.url.substring(job.url.length-40, job.url.length) %><% } else { %>N.A<% } %></td>
                                             <td><%= job.completed_at %></td>
                                         </tr>
                                     <% }); %>
