@@ -78,7 +78,7 @@ done
 cd $app_root
 
 # clean old files
-for f in `ls logs/*.csv`; do rm logs/$f; done;
+for f in `ls logs/*.csv`; do rm -f $f; done;
 
 # if data source is API
 if [ $src == "db" ]; then
@@ -128,8 +128,9 @@ echo ""
 # sync to cdn reports/screenshots
 echo "Synchronizing to CDN ... ";
 for x in `ls screenshots/`; do node sync_to_cdn.js screenshots/$x; done;
+echo "Cleaning up..."
+rm logs/$log;
 for r in `ls logs/`; do node sync_to_cdn.js logs/$r; done;
 echo "Done synchronizing.";
-echo "Cleaning up..."
-# for f in `ls logs/*.csv`; do rm logs/$f; done;
+echo ""
 echo "Bot process completed!"
