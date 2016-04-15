@@ -23,7 +23,9 @@ var express = require('express'),
     util    = require('util'),
     shortid = require('shortid'),
     cookieParser = require('cookie-parser'),
-    session      = require('express-session');
+    session      = require('express-session'),
+    mongoose     = require('mongoose');
+    
     connectionpool = mysql.createPool({
         host     : mysql_cfg.MYSQL_HOST,
         user     : mysql_cfg.MYSQL_USER,
@@ -31,10 +33,14 @@ var express = require('express'),
         database : mysql_cfg.MYSQL_DB
     });
 
+// servers
 var log     = require("./includes/log.js");
 var http    = require('http').Server(app);
 var io      = require('socket.io')(http);
 var routes  = require('./routes');
+
+// mongo
+mongoose.connect(config.MONGODB_HOST);
 
 /* app config */
 app.use(express.static(path.join(__dirname, '/')));

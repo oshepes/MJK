@@ -115,7 +115,7 @@ exports.jobs = function (req, res) {
     imports('includes/config.js');
     var Job         = require('../models/job');
     var limit       = req.params.limit || 1500; 
-        
+    
     Job.find({}).
             select({job_id: 1, url: 1, violations: 1, created_at: 1, completed_at: 1}).
             where('violations').ne('').
@@ -133,8 +133,10 @@ exports.jobs = function (req, res) {
 /* campaigns endpoint mongodb */
 exports.campaigns = function (req, res) {
     imports('includes/config.js');
+    var mongoose    = require('mongoose');
     var limit       = req.params.limit || 1500; 
     var Campaign    = require('../models/campaign');
+    mongoose.connect(config.MONGODB_HOST); 
     
     Campaign.find({}).
             select({account_id: 1, account_name: 1, screenshot: 1, url: 1, violations: 1, created_at: 1, completed_at: 1}).
@@ -290,33 +292,50 @@ exports.setCampaign = function(req, res) {
 };
 
 exports.finish = function(req, res) {
-    var job_id  = req.params.job_id || null;
-    var logfile = req.params.logfile || null;
     var fs      = require('fs');
     var util    = require('util');
-    var Job     = require('../models/job');
+    // params
+    var job_id  = req.params.job_id || null;
+    var logfile = req.params.logfile || null;
     var feed    = 'data/feed.csv';
     var logfeed = util.format("logs/%s_%s.csv", logfile, job_id);
     var now     = new Date();
+    // models
+    var Job         = require('../models/job');
+    var Campaign    = require('../models/campaign');
+   
+    
     console.log('Finishing job: %s', job_id);
-    // feed
+    /* feed
     try {
         fs.readFile(feed, 'utf8', function(err, contents) {
             lines = contents.split('\n');
             lines.forEach(function(line) {
-                var parts = line.split(',');
-                var url = parts[parts.length - 1];
+                var parts       = line.split(',');
+                var url         = parts[parts.length - 1];
+                var acct_id     = parts[0];
+                var acct_name   = parts[1];
+                var cmp_name    = parts[2];
+                var adgrp_name  = parts[3];
+                var username    = parts[4];
+                var code        = parts[5];
                 if(url && job_id) {
                    
-                    var newJob = Job({
+                    var newCampaign = Campaign({
                         job_id: job_id,
-                        url: url,
+                        account_id: acct_id,
+                        account_name: acct_name,
+                        campaign_name: cmp_name,
+                        adgroup_name: adgrp_name,
+                        username: username,
+                        code: code,
+                        destination_url: url,
                         violations: "",
                         created_at: now,
                         completed_at: now
                     });
                    
-                    newJob.save(function(err) {
+                    newCampaign.save(function(err) {
                         if (err) {
                             console.log(JSON.stringify(err));
                             throw err;
@@ -329,7 +348,7 @@ exports.finish = function(req, res) {
     } catch (e) {
         console.log(e.stack);
     }
-    
+    */
     // violations
     console.log('processing violations... %s', logfeed);
     try {
@@ -338,7 +357,7 @@ exports.finish = function(req, res) {
                 lines = contents.split('\n');
                 lines.forEach(function (line) {
                     var parts = line.split(',');
-                    var url = parts[parts.length - 2];
+                    var url = parts[parts.length - 1];
                     var violations = parts[3];
                     console.log('url: %s, job: %s, violations:', url, job_id, violations);
                     if (url && job_id && url !== 'URL') {
@@ -367,7 +386,7 @@ exports.finish = function(req, res) {
     } catch (e) {
         console.log(e.stack);
     }
-    
+   
     res.send('feed processing done!');
 };
 

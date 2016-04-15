@@ -5,9 +5,9 @@
  */
 
 imports('includes/config.js');
+
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-mongoose.connect(config.MONGODB_HOST);
 
 var campaignSchema = new Schema({
     account_id: { type: String, required: true },
