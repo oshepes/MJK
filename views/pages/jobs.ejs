@@ -14,6 +14,8 @@
                                     <thead>
                                         <tr>
                                             <th>JobID</th>
+                                            <th>AcctID</th>
+                                            <th>Campaign</th>
                                             <th>Violations</th>
                                             <th>Screenshot</th>
                                             <th>Completed At</th>
@@ -24,9 +26,11 @@
                                     <% if(job.violations && job.violations.indexOf('Error Type') === -1) { %>
         				<tr>
                                             <td><%= job.job_id %></td>
+                                            <td><%= job.account_id %></td>
+                                            <td><%= job.campaign_name %></td>
                                             <td><%= job.violations %></td>
-                                            <td><% if(job.url) { %><a target="_blank" href="<%= job.url %>"><%= job.url.split('/').reverse()[0].substring(0,60) %>...</a><% } else { %>N.A<% } %></td>
-                                            <td><%= job.completed_at %></td>
+                                            <td><% if(job.screenshot) { %><a target="_blank" class="btn btn-sm btn-primary" href="<%= job.screenshot %>">View</a><% } else { %>N.A<% } %></td>
+                                            <td><%= job.completed_at.toString().substring(0,job.completed_at.toString().length-14) %></td>
                                         </tr>
                                     <% } %>
                                     <% }); %>

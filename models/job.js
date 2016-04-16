@@ -11,7 +11,11 @@ var Schema = mongoose.Schema;
 
 var jobSchema = new Schema({
     job_id: { type: String, required: true },
-    url: String,
+    account_id: { type: String, required: true },
+    account_name: String,
+    campaign_name: { type: String },
+    destination_url: { type: String, required: true },
+    screenshot: String,
     violations: String,
     created_at: Date,
     completed_at: Date
