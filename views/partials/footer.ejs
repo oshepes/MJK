@@ -149,7 +149,7 @@
 
                 socket.on('newdata', function(d){
                     $('#botstatus').html(d);
-                    $("html, body").animate({ scrollTop: $(document).height() }, "slow");
+                    $("html, body").animate({ scrollTop: $(document).height() }, "fast");
                 });
 
                 socket.on('killed', function(d){
@@ -190,6 +190,7 @@
         });
 
         if('#jobs') $('#jobs').DataTable();
+        if('#reports') $('#reports').DataTable();
     });
     </script>
 </body>

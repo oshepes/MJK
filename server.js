@@ -104,9 +104,11 @@ io.on('connection', function(socket){
         var feed    = 'feed.csv';
                 
         var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', feed, '-u', ua, '-r', params.email, '-l', log.getLogFile(), '-v', params.detect, '-j', job_id]);
-	console.log('running bot...');
-        console.log('params: %s=%s, %s=%s, %s=%s, %s=%s, %s=%s, %s=%s, %s=%s', 'rcpt', params.email, 'ua', ua, 'src', source, 'offset', offset, 'limit', limit, 'logfile', log.getLogFile(), 'detect', params.detect);
-	        
+	console.log('running bot process...');
+        Object.keys(params).forEach(function (key) {
+           console.log('%s: %s', key, params[key]); 
+        });
+               
         io.emit('start', spw.pid);
         
 	var chunk = '';

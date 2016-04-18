@@ -3,21 +3,21 @@
 <link rel="stylesheet" href="/css/bootstrap-multiselect.css" type="text/css"/>
 <!-- content area -->
 		<div class="row">
-		    <div id="list" class="col-lg-10">
+		    <div class="col-lg-12">
 			   <h1 class="page-header">
                            	<small>ADVCP BOT</small>
 	                   </h1>
                            <div class="panel-body">
                                 <div class="row">
                                     <input type="hidden" name="botProcess" id="botProcess" value="" />
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <label style="font-weight: 400" for="src">Data Source</label>
                                         <select class="form-control" name="src" id="src">
                                             <option value="file">File</option>
                                             <option value="db">Database</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-7">
                                         <label style="font-weight: 400" for="src">User Agent (Browser)</label><br/>
                                         <select class="form-control" name="ua" id="ua" multiple="multiple">
                                         <% Object.keys(uas).forEach(function(u) { %>
@@ -30,24 +30,24 @@
                                 <!-- db options -->
                                 <div class="form-group" style="display: none" id="dbContainer">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <label style="font-weight: 400" for="offset">Offset (Start Position)</label>
                                         <input class="form-control" name="offset" id="offset" value="0" />
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-7">
                                         <label style="font-weight: 400" for="limit">Limit (Number of Records)</label>
                                         <input class="form-control" name="limit" id="limit" value="1000" />
                                     </div>
                                 </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <!-- upload form -->
                                         <div class="form-group" id="chkContainer">
                                             <input type="checkbox" id="chkUpload" name="chkUpload" /> <label style="font-weight: 400" for="chkUpload">Upload Feed</label>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-7">
                                         <label style="font-weight: 400" for="src">Violations</label>
                                         <select class="form-control" name="detect" id="detect" multiple="multiple">
                                         <% Object.keys(detect).forEach(function(d) { %>
