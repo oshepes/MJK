@@ -48,6 +48,8 @@
 				<exclude>**/conf/*</exclude>
 				<exclude>**/assembly/**</exclude>
 				<exclude>**/target/**</exclude>
+                                <exclude>**/logs/*</exclude>
+                                <exclude>**/data/*</exclude>
 				</excludes>
 			</resource>
 			<resource>
@@ -80,7 +82,7 @@
 		<profile>
 			<id>production</id>
 			<properties>
-				<advdb.hostname>10.8.2.201</advdb.hostname>
+				<advdb.hostname>10.8.2.212</advdb.hostname>
 				<advdb.username>advcp</advdb.username>
 				<advdb.password>lastchance</advdb.password>
 				<advdb.database>advertisedb</advdb.database>

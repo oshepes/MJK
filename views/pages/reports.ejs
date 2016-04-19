@@ -20,7 +20,7 @@
                                     <tbody>
                                     <% files.forEach(function(file) { %>
                                         <tr>
-                                            <td><%= file.split("_")[1].replace(".csv","") %></td>
+                                            <td><%= file.split("_").pop().replace(".csv","") %></td>
                                             <td><%= file.split("_")[0].split("/")[1] %></td>
                                             <td><%= file.replace("logs/","") %></td>
                                             <td><a target="_blank" class="btn btn-sm btn-primary" href="<%= cdn_host %><%= file %>">View</a></td>
