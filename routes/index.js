@@ -49,24 +49,75 @@ exports.process = function(req, res) {
 
 /* upload */
 exports.upload = function(req, res) {
-    var fs      = require('fs');
-    var multer  = require('multer'),
+    var fs      = require('fs'),
+        shortid = require('shortid'),
+        util    = require('util'),
+        multer  = require('multer'),
     	storage = multer.diskStorage({
-        destination: function (req, file, callback) {
-            callback(null, './data');
-        },
-        filename: function (req, file, callback) {
-            callback(null, 'feed.csv'); // TODO: timestamp: + Date.now());
-        }
+            destination: function (req, file, callback) {
+                callback(null, './data');
+            },
+            filename: function (req, file, callback) {
+                callback(null, 'feed.csv'); // TODO: timestamp: + Date.now());
+            }
     });
-    var upload = multer({storage : storage}).single('feed');
-
+    var Campaign    = require('../models/campaign');
+    var upload      = multer({storage : storage}).single('feed');
+    var feed        = 'data/feed.csv';
+    
     upload(req, res, function(err) {
         if(err) {
             return res.end("Error uploading file: " + err);
         }
         try {
-            fs.chmodSync('data/feed.csv', '777');
+            fs.chmodSync(feed, '777');
+            // process and save feed        
+            var job_id  = shortid.generate();
+            var now     = new Date();
+
+            fs.readFile(feed, 'utf8', function (err, contents) {
+                if (contents && contents.length > 1) {
+                    lines = contents.split('\n');
+                    lines.forEach(function (line) {
+                        var parts = line.split(','),
+                            acct_id     = parts[0],
+                            acct_name   = parts[1],
+                            cmp_name    = parts[2],
+                            adgrp_name  = parts[3],
+                            username    = parts[4],
+                            screenshot  = '',
+                            url         = parts[parts.length - 1],
+                            violations  = '';
+                       
+                        if (acct_id && url && job_id && url !== 'URL') {
+
+                            var newCampaign = Campaign({
+                                job_id: job_id,
+                                account_id: acct_id,
+                                account_name: acct_name,
+                                campaign_name: cmp_name,
+                                adgroup_name: adgrp_name,
+                                destination_url: url,
+                                screenshot: screenshot,
+                                violations: violations,
+                                created_at: now,
+                                completed_at: now
+                            });
+
+                            newCampaign.save(function (err) {
+                                if (err) {
+                                    console.log(JSON.stringify(err));
+                                    throw err;
+                                }
+                                console.log('saving campaign: %s: %s: %s', job_id, acct_id, url);
+                            });
+                        }
+                    });
+                } else {
+                    console.log('skipping: %s, contents: %s', job_id, contents);
+                }
+            });
+
         } catch(e) {
             console.log('Error: %s', e.stack);
         }
@@ -300,10 +351,8 @@ exports.finish = function(req, res) {
     var feed    = 'data/feed.csv';
     var logfeed = util.format("logs/%s_%s.csv", logfile, job_id);
     var now     = new Date();
-    // models
-    var Job         = require('../models/job');
-    var Campaign    = require('../models/campaign');
-   
+    // model
+    var Job     = require('../models/job');  
     
     console.log('Finishing job: %s', job_id);
     
