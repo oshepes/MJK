@@ -71,6 +71,16 @@ var casper = require("casper").create({
     onLoadError: handleLoadError,
 });
 
+// capture screen
+casper.captureScreen = function() {
+    this.capture(this.loc_img, {
+        top: screen._top,
+        left: screen._left,
+        width: screen._width,
+        height: screen._height
+    });
+};
+
 // user agents object
 casper.userAgents = userAgents;
 
@@ -159,19 +169,19 @@ function crawl(ua_key, urls) {
         casper.thenOpen(url, function openUrl(res) {
             
             var errors = [];
+            var file    = util.format('%s_%s_%s', aid, cid, cname);
+            this.loc_img = util.format('screenshots/%s_%s_%sx%s.png',file, ua_key.replace(/\//g, "."), screen._width, screen._height);
             
             this.echo(util.format('%d) %s: %s [%s]', i++, ua_key, url, res.status));    
             this.currentResponse.headers.forEach(function(header){
                 if(header.name === 'X-Frame-Options' && (header.value === 'SAMEORIGIN' || header.value === 'DENY')) {
                     if(check("CODE_XFRAME", detect)) { 
+                        this.captureScreen();
                         errors.push(util.format('%s: %s', header.name, header.value));
                     }
                 }
             });
-  
-            var file    = util.format('%s_%s_%s', aid, cid, cname);
-            var loc_img = util.format('screenshots/%s_%s_%sx%s.png',file, ua_key.replace(/\//g, "."), screen._width, screen._height);
-            
+              
             /* instant articles */
             articleMetas = this.evaluate(function() {
                 var metas = [];
@@ -190,6 +200,7 @@ function crawl(ua_key, urls) {
             /* found 3 conditions to flag as IA */
             if(articleMetas.length === 3) {
                 if(check("CODE_FBIA", detect)) {
+                    this.captureScreen();
                     errors.push('Facebook Instant Article');
                 }
             }
@@ -212,6 +223,7 @@ function crawl(ua_key, urls) {
             /* reCAPTCHA */
             if(reCAPTCHA.length > 0) {
                 if(check("CODE_CAPTCHA", detect)) {
+                    this.captureScreen();
                     errors.push('reCAPTCHA');
                 }
             }
@@ -219,6 +231,7 @@ function crawl(ua_key, urls) {
             /* 404 */
             if(res.status == 404) {
                 if(check("CODE_404", detect)) {
+                    this.captureScreen();
                     errors.push('404 Error');
                 }
             }
@@ -226,6 +239,7 @@ function crawl(ua_key, urls) {
             /* 500 */
             if(res.status >= 500) {
                 if(check("CODE_500", detect)) {
+                    this.captureScreen();
                     errors.push('500 Error');
                 }
             }
@@ -236,14 +250,6 @@ function crawl(ua_key, urls) {
                 errors.join('|'), log_delim, errors.join('|'), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
             }
             
-            /* capture screen */
-            this.capture(loc_img, {
-                top: screen._top,
-                left: screen._left,
-                width: screen._width,
-                height: screen._height
-            });
-               
         }, logfile, screen, casper.campaign.url, aid, cid, cname, ua_key, log_delim)
         
     }, ua_key, casper, userAgents)
@@ -261,6 +267,7 @@ function crawl(ua_key, urls) {
 function handleAlert(casper, msg) {
     if(check("CODE_JSPOP", detect)) {
         if(casper.campaign.url == casper.getCurrentUrl()) {
+            casper.captureScreen();
             casper.totalErrors += 1;
             fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim,
                 'JS Alert (Pop)', log_delim, msg.replace(/\*/g,'').replace(/\r\n|\n|\r/gm,' ').replace(',',''), log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a'); 
@@ -272,6 +279,7 @@ function handleAlert(casper, msg) {
 function handleLoadError(casper, msg) {
     if(check("CODE_500", detect)) {
         if(casper.campaign.url == casper.getCurrentUrl()) {
+            casper.captureScreen();
             casper.totalErrors += 1;
             fs.write(logfile, util.format(formatter, casper.campaign.aid, log_delim, casper.campaign.cid, log_delim, casper.campaign.cname, log_delim, 
                 'Resource Load Error', log_delim, 'Unavailable', log_delim, casper.campaign.url, log_delim, casper.campaign.remote_img), 'a');

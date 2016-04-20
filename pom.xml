@@ -82,7 +82,7 @@
 		<profile>
 			<id>production</id>
 			<properties>
-				<advdb.hostname>10.8.0.164</advdb.hostname>
+				<advdb.hostname>prod-cs-advdb-rep-01</advdb.hostname>
 				<advdb.username>advcp</advdb.username>
 				<advdb.password>lastchance</advdb.password>
 				<advdb.database>advertisedb</advdb.database>
