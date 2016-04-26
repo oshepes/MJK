@@ -15,6 +15,7 @@
 # --l={logfile} log file name
 # --o={offset} offset position in db resultset
 # --t={limit} number of records to fetch
+# --p={proxy list} proxy servers to use
 # --h print available user-agent options
 # --u={UA_KEY} use specified user-agent (ex: --ua=Chrome41/Win7)
 
@@ -28,6 +29,7 @@ usage() {
 	echo "-d delimiter (default ,)"
 	echo "-u user-agent to use in spider (use key from object below)"
 	echo "-r email recipient of report"
+	echo "-p proxy servers"
 	echo "-s data source (db|file) the above -f is ignored if this is set"
 	echo "-o offset in resultset from db"
 	echo "-t number of records from db resultset"
@@ -40,7 +42,7 @@ usage() {
 
 args=""
 
-while getopts ":f:d:l:u:r:s:m:o:j:t:v:h" opt; do
+while getopts ":f:d:l:u:r:s:m:o:j:t:v:p:h" opt; do
   case $opt in
     f) 	feed="$OPTARG"; args+=" --feed=$feed"
     ;;
@@ -64,6 +66,8 @@ while getopts ":f:d:l:u:r:s:m:o:j:t:v:h" opt; do
     ;;
     v)  detect="$OPTARG"; args+=" --detect=$detect"
     ;;
+    p)  prox_list="$OPTARG"; p_list=`echo $prox_list | sed 's/__/\:/g'`; prox=`echo $p_list | sed 's/_/\./g'`;
+    ;;
     h) 	help="$OPTARG"; args+=" --ua_help"
        	usage
 	exit
@@ -73,6 +77,7 @@ while getopts ":f:d:l:u:r:s:m:o:j:t:v:h" opt; do
     ;;
   esac
 done
+
 
 # cd to location
 cd $app_root
@@ -93,15 +98,36 @@ report=$(printf "%s_%s.csv" $log $jobid)
 IFS=',' read -r -a array <<< "$ua"
 for ua in "${array[@]}"
 do 
-    	echo "Running bot ($ua) ... ";
-    	cmd="casperjs --ignore-ssl-errors=true $args --ua=$ua crawler.js"
-    	echo $cmd; $cmd
-    	echo "Done crawling."
+	if [ -n "$prox" ]; then
+	echo "using proxies: $prox" 
+	# proxy list
+	IFS=',' read -r -a p_array <<< "$prox"
+	for pxy in "${p_array[@]}"
+	do
+	    	echo "Running bot ($ua) ... ";
+    		cmd="casperjs --ignore-ssl-errors=true $args --proxy=$pxy --ua=$ua crawler.js"
+    		echo $cmd; $cmd
+    		echo "Done crawling."
 
-	# prepare report 
-        cat_cmd=`cat logs/$log >> logs/$report`
-	echo $cat_cmd; $cat_cmd
-	oldlog=$(printf "logs/%s" $log)
+		# prepare report 
+        	cat_cmd=`cat logs/$log >> logs/$report`
+		echo $cat_cmd; $cat_cmd
+		oldlog=$(printf "logs/%s" $log)
+	done
+
+	else
+
+	echo "Running bot ($ua) ... ";
+             cmd="casperjs --ignore-ssl-errors=true $args --ua=$ua crawler.js"
+             echo $cmd; $cmd
+             echo "Done crawling."
+
+             # prepare report 
+             cat_cmd=`cat logs/$log >> logs/$report`
+             echo $cat_cmd; $cat_cmd
+             oldlog=$(printf "logs/%s" $log)
+
+	fi	
 done
 
 # sort and uniq report

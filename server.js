@@ -12,6 +12,7 @@ imports('includes/useragents.js');
 imports('includes/detect.js');
 imports('includes/config.js');
 imports('includes/rackspace.js');
+imports('includes/proxy.js');
 
 var express = require('express'),
     app     = express(),
@@ -100,10 +101,11 @@ io.on('connection', function(socket){
         var ua      = params.ua || 'Chrome41/Win7';
         var offset  = params.offset || 0;
         var limit   = params.limit || 1000;
+        var proxies = params.proxies || '';
         var job_id  = shortid.generate();
         var feed    = 'feed.csv';
                 
-        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', feed, '-u', ua, '-r', params.email, '-l', log.getLogFile(), '-v', params.detect, '-j', job_id]);
+        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', feed, '-u', ua, '-r', params.email, '-p', proxies, '-l', log.getLogFile(), '-v', params.detect, '-j', job_id]);
 	console.log('running bot process...');
         Object.keys(params).forEach(function (key) {
            console.log('%s: %s', key, params[key]); 

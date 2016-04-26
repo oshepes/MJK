@@ -60,7 +60,7 @@
         });
 
         $('#top').click(function() {
-            $("html, body").animate({ scrollTop: 0 }, "slow");
+            $("html, body").animate({ scrollTop: 0 }, "fast");
         });
 
         $('#techBtn').click(function() {
@@ -111,6 +111,7 @@
             var offset  = $('#offset').val();
             var limit   = $('#limit').val();
             var detect  = $('#detect').val();
+            var proxies = $('#proxies').val();
 
             if(source == 'db') {
                 var regex = /^\d+$/;
@@ -131,7 +132,7 @@
             if(re.test(email)) {
                 var socket = io('<%= socket_io %>');
 
-                socket.emit('run', {email: email, src: source, ua: ua, offset: offset, limit: limit, detect: detect});
+                socket.emit('run', {email: email, src: source, ua: ua, offset: offset, limit: limit, detect: detect, proxies: proxies});
 
                 socket.on('start', function(id){
                     $('#botProcess').val(id);
@@ -187,6 +188,12 @@
             dropRight: true,
             numberDisplayed: 4,
             select: 'Android/Mobile',
+        });
+        if($('#proxies')) $('#proxies').multiselect({
+            checkboxName: 'proxies[]',
+            buttonWidth: '100%',
+            dropRight: true,
+            numberDisplayed: 4
         });
 
         if('#jobs') $('#jobs').DataTable();

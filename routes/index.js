@@ -11,7 +11,7 @@ exports.home = function(req, res){
 
 /* run */
 exports.run = function(req, res){
-    res.render('pages/run', {uas: userAgents, detect: detect, socket_io: config.ADV_SOCKET, host: config.ADV_HOST});
+    res.render('pages/run', {uas: userAgents, detect: detect, socket_io: config.ADV_SOCKET, host: config.ADV_HOST, proxy: proxy});
 };
 
 /* reports */
