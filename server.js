@@ -104,9 +104,10 @@ io.on('connection', function(socket){
         var proxies = params.proxies || '';
         var job_id  = shortid.generate();
         var feed    = 'feed.csv';
+        var wrapper = '/var/www/html/advcp/main.sh';
                 
-        var spw = cp.spawn("/var/www/html/advcp/main.sh", ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', feed, '-u', ua, '-r', params.email, '-p', proxies, '-l', log.getLogFile(), '-v', params.detect, '-j', job_id]);
-	console.log('running bot process...');
+        var spw = cp.spawn(wrapper, ['-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', feed, '-u', ua, '-r', params.email, '-p', proxies, '-l', log.getLogFile(), '-v', params.detect, '-j', job_id]);
+	process.stdout.write(util.format('%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s', wrapper, '-m', ',', '-o', offset, '-t', limit, '-s', source, '-f', feed, '-u', ua, '-r', params.email, '-p', proxies, '-l', log.getLogFile(), '-v', params.detect, '-j', job_id));
         Object.keys(params).forEach(function (key) {
            console.log('%s: %s', key, params[key]); 
         });
