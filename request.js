@@ -10,7 +10,7 @@ var util 	= require('util');
 var request 	= require('request');
 
 var offset      = process.argv[2] || 0;
-var limit       = process.argv[3] || 1000;
+var limit       = process.argv[3] || 10000;
 
 require('node-import');
 imports('includes/config.js');
@@ -40,11 +40,23 @@ request(endpoint, function (error, response, body) {
         
       	var obj = JSON.parse(body);
 	obj.json.forEach(function(cam) {
-		fs.appendFile(feed, util.format(formatter, cam.AccID, delim, cam.Account, delim, cam.CampName, delim, cam.AdgrpName, delim, cam.user_name, delim, cam.destination_url), {
+            if(cam.destination_url && cam.destination_url.length > 6) {
+                try {
+                    var url     = cam.destination_url.replace(/\r\n|\n|\r/gm,' ').replace(',','');
+                    var account = cam.Account.replace(/\r\n|\n|\r/gm,' ').replace(',','');
+                    var camName = cam.CampName.replace(/\r\n|\n|\r/gm,' ').replace(',','');
+                    var adgrp   = cam.AdgrpName.replace(/\r\n|\n|\r/gm,' ').replace(',','');
+                    var user    = cam.user_name.replace(/\r\n|\n|\r/gm,' ').replace(',','');
+                
+                    fs.appendFile(feed, util.format(formatter, cam.AccID, delim, account, delim, camName, delim, adgrp, delim, user, delim, url), {
 			encoding: 'utf8',
 			mode: 777,
 			flags: 'a' 
-		});
+                    });
+                } catch(e) {
+                    console.log('Error writing feed: %s', e.stack);
+                }
+            }
      	});
     } catch(err) {
         console.log('Error writing feed: %s', err.stack);

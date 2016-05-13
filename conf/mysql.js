@@ -15,7 +15,7 @@ var mysql_cfg = {
                     "AND C.status_id = 7 " +
                     "AND A.status = 7 " +
                     "AND AG.status_id = 7 " +
-                    "AND AD.status_id = 7 LIMIT %d, %d",
+                    "AND AD.status_id = 7 GROUP BY AD.destination_url LIMIT %d, %d",
         "CMP_TOTAL": "SELECT COUNT(1) AS total " +
                     "FROM adgroup_property AP " +
                     "LEFT JOIN property P ON (AP.property_id = P.id) " +

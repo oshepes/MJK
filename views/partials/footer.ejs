@@ -121,9 +121,9 @@
                     return false;
                 }
                 
-                if(!regex.test(limit) || limit > 2000) {
+                if(!regex.test(limit) || limit > 10000) {
                     $('#email-error').addClass('alert alert-danger');
-                    $('#email-error').html('Limit value has to be between 0 and 2000');
+                    $('#email-error').html('Limit value has to be between 0 and 10000');
                     return false;
                 }
             }
