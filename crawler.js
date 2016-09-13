@@ -141,7 +141,7 @@ getData(feed, delim, src, function(res) {
 // check if we got data
 if(urls.length < 1) console.log('Did not get any URLs to process, existing.');
 
-// crawal
+// crawl
 crawl(ua, urls);
 
 
