@@ -1,7 +1,4 @@
 # MJK
-##Advertiser Comliance Spider 
-##author: Oren Shepes <oren [at] advertise.com>
-##since: 2/17/16
 
 ```
 DESCRIPTION:
